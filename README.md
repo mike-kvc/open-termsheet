@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Open Termsheet
 
-## Getting Started
+스타트업 투자 텀시트(Term Sheet)의 주요 조항을 **창업자와 투자자 양쪽 관점**에서 해석하는 오픈소스 가이드입니다.
 
-First, run the development server:
+## 왜 만들었나
+
+- 텀시트 조항은 법률 용어로 가득 차 있어 창업자가 이해하기 어렵습니다
+- 투자자가 왜 그 조항을 넣는지 객관적으로 설명하는 자료가 부족합니다
+- 한국 상법/벤처투자법 기준으로 정리된 자료가 거의 없습니다
+
+## 특징
+
+- **양면 해석** — 각 조항을 창업자/투자자 관점에서 설명
+- **사례 기반** — 구체적인 숫자 시나리오로 조항의 실질적 영향을 보여줌
+- **법률 검토** — 한국 상법, 벤처투자법 등 관련 법령과 리스크 포인트
+- **시장 기준** — founder-friendly ↔ investor-friendly 스펙트럼 표시
+
+## 현재 포함된 조항
+
+| 조항 | 카테고리 |
+|------|----------|
+| 잔여재산분배우선권 (Liquidation Preference) | 경제적 조건 |
+| 희석방지권 (Anti-dilution) | 경제적 조건 |
+| 창업자 베스팅 (Founder Vesting) | 창업자 관련 |
+
+## 시작하기
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 에서 확인할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 기여하기
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+새로운 조항 추가, 기존 해석 보완, 법률 검토 업데이트 등 모든 기여를 환영합니다.
 
-## Learn More
+### 조항 추가 방법
 
-To learn more about Next.js, take a look at the following resources:
+1. `src/data/clauses/` 에 새 파일 생성
+2. `Clause` 타입에 맞춰 데이터 작성 (`src/types/clause.ts` 참고)
+3. `src/data/clauses/index.ts`에 등록
+4. PR 제출
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 기여 시 참고사항
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- 사례는 구체적인 숫자와 시나리오를 포함해주세요
+- 법률 검토는 근거 법령을 명시해주세요
+- 이 프로젝트는 법률 자문이 아닙니다 — 실제 계약 시 전문가 검토가 필요하다는 점을 항상 명시해주세요
 
-## Deploy on Vercel
+## Disclaimer
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+이 사이트의 내용은 **법률 자문이 아니며**, 실제 투자 계약 시 반드시 전문가(변호사, 세무사)의 검토를 받으시기 바랍니다. 정보의 정확성을 보장하지 않으며, 이 자료를 근거로 한 의사결정에 대해 책임지지 않습니다.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT
