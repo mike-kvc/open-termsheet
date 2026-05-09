@@ -98,6 +98,11 @@ export const dragAlong: Clause = {
         relevance:
           "Drag-Along 행사로 대규모 기업결합이 발생하는 경우 공정거래위원회 신고 의무가 발생할 수 있음. 클로징 일정 계획에 반영 필요.",
       },
+      {
+        name: "벤처투자촉진에 관한 특별법 제50조 (벤처투자의 방법)",
+        relevance:
+          "벤처투자조합이 투자자인 경우, Drag-Along을 통한 M&A EXIT은 조합의 투자금 회수 수단에 해당합니다. 조합 규약상 M&A 참여 및 의결 방식, 조합원 동의 절차 등을 사전에 확인해야 하며, 조합 GP가 Drag-Along 발동에 찬성하는 결정을 내릴 때는 수익자(LP)의 이익을 최우선으로 고려해야 합니다.",
+      },
     ],
     risk_level: "red",
     issues: [

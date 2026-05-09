@@ -35,9 +35,20 @@ export default function RootLayout({
             <Link href="/" className="text-lg font-semibold tracking-tight">
               Open Termsheet
             </Link>
-            <span className="text-xs text-zinc-400">
-              법률 자문이 아닙니다 · 참고용
-            </span>
+            <nav className="flex items-center gap-4">
+              <Link
+                href="/laws"
+                className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
+              >
+                법령
+              </Link>
+              <Link
+                href="/faq"
+                className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
+              >
+                FAQ
+              </Link>
+            </nav>
           </div>
         </header>
         <main className="flex-1">{children}</main>

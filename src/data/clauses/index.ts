@@ -11,6 +11,9 @@ import { dragAlong } from "./drag-along";
 import { putOption } from "./put-option";
 import { deemedLiquidation } from "./deemed-liquidation";
 import { lockUp } from "./lock-up";
+import { nonCompete } from "./non-compete";
+import { repsAndWarranties } from "./reps-and-warranties";
+import { conditionsPrecedent } from "./conditions-precedent";
 
 export const clauses: Clause[] = [
   liquidationPreference,
@@ -25,6 +28,9 @@ export const clauses: Clause[] = [
   deemedLiquidation,
   lockUp,
   vesting,
+  nonCompete,
+  repsAndWarranties,
+  conditionsPrecedent,
 ];
 
 export const clauseMap = Object.fromEntries(

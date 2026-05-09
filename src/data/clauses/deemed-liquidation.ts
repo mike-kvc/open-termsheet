@@ -138,6 +138,16 @@ export const deemedLiquidation: Clause = {
         relevance:
           "상장사 또는 상장 예정 법인의 경우, 대량 주식 이전 시 공시 의무 및 공개매수 규정이 Deemed Liquidation 트리거와 병행 검토 필요.",
       },
+      {
+        name: "벤처투자촉진에 관한 특별법 제41조 (조합원에 대한 분배)",
+        relevance:
+          "벤처투자조합이 M&A 등 Deemed Liquidation 트리거 발동으로 투자금을 회수하는 경우, 조합원(LP)에 대한 분배 절차 및 우선순위는 조합 규약과 이 규정의 적용을 받습니다. 투자계약상 Deemed Liquidation에 따른 우선분배 구조가 조합의 분배 규정과 정합성을 갖추어야 합니다.",
+      },
+      {
+        name: "벤처투자촉진에 관한 특별법 제50조 (벤처투자의 방법)",
+        relevance:
+          "주식·전환사채 등 투자 방식에 따라 M&A EXIT 시 Deemed Liquidation 적용 방식이 달라질 수 있습니다. 벤처투자조합이 투자자인 경우, M&A 대금 분배 구조가 조합의 투자금 회수 규정 및 조합 규약과 일치하는지 확인해야 합니다.",
+      },
     ],
     risk_level: "yellow",
     issues: [
