@@ -17,7 +17,7 @@ https://open-termsheet.vercel.app
 - **법률 검토** — 한국 상법, 벤처투자법, 벤처기업법 등 관련 법령과 리스크 포인트
 - **시장 기준** — founder-friendly ↔ investor-friendly 스펙트럼 표시
 
-## 포함된 조항 (12개)
+## 포함된 조항 (15개)
 
 | 카테고리 | 조항 |
 |----------|------|
@@ -25,13 +25,16 @@ https://open-termsheet.vercel.app
 | 경제적 조건 | 희석방지권 (Anti-dilution) |
 | 경제적 조건 | 전환권 (Conversion Right) |
 | 경제적 조건 | 상환권 (Redemption Right) |
+| 경제적 조건 | 선행조건 (Conditions Precedent) |
 | 투자자 보호 | 사전동의권 (Protective Provisions) |
 | 투자자 보호 | 우선매수권 (Right of First Refusal) |
 | 투자자 보호 | 풋옵션 (Put Option) |
+| 투자자 보호 | 진술 및 보장 (Representations & Warranties) |
 | Exit 관련 | 동반매각요구권 (Tag-Along) |
 | Exit 관련 | 동반매도청구권 (Drag-Along) |
 | Exit 관련 | 간주청산 (Deemed Liquidation) |
 | 지배구조 | 주식처분제한 (Lock-up) |
+| 지배구조 | 경업금지 및 전업의무 (Non-compete) |
 | 창업자 관련 | 창업자 베스팅 (Founder Vesting) |
 
 ## 정보 출처
