@@ -14,6 +14,7 @@ import { lockUp } from "./lock-up";
 import { nonCompete } from "./non-compete";
 import { repsAndWarranties } from "./reps-and-warranties";
 import { conditionsPrecedent } from "./conditions-precedent";
+import { boardNomination } from "./board-nomination";
 
 export const clauses: Clause[] = [
   liquidationPreference,
@@ -31,6 +32,7 @@ export const clauses: Clause[] = [
   nonCompete,
   repsAndWarranties,
   conditionsPrecedent,
+  boardNomination,
 ];
 
 export const clauseMap = Object.fromEntries(
