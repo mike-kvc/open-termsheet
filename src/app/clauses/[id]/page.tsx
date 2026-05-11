@@ -173,7 +173,21 @@ export default async function ClausePage({
                 key={law.name}
                 className="border border-zinc-200 rounded-lg p-3 text-sm"
               >
-                <div className="font-medium text-zinc-800">{law.name}</div>
+                <div className="font-medium text-zinc-800">
+                  {law.url ? (
+                    <a
+                      href={law.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-blue-600 transition-colors underline decoration-zinc-300 underline-offset-2"
+                    >
+                      {law.name}
+                      <span className="text-xs text-zinc-400 ml-1">↗</span>
+                    </a>
+                  ) : (
+                    law.name
+                  )}
+                </div>
                 <p className="text-zinc-500 mt-1">{law.relevance}</p>
               </div>
             ))}
@@ -202,6 +216,42 @@ export default async function ClausePage({
           </div>
         </div>
       </Section>
+
+      {/* War Stories */}
+      {clause.war_stories && clause.war_stories.length > 0 && (
+        <Section title="이 조항이 피로 쓰여진 이유">
+          <div className="space-y-4">
+            {clause.war_stories.map((story) => (
+              <div
+                key={story.title}
+                className="bg-zinc-900 text-zinc-100 rounded-lg p-5 relative overflow-hidden"
+              >
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
+                <div className="text-xs text-red-400 font-medium mb-2 uppercase tracking-wider">
+                  실제 사례
+                </div>
+                <h4 className="font-semibold text-sm text-white mb-3">
+                  {story.title}
+                </h4>
+                <p className="text-sm text-zinc-300 leading-relaxed mb-3">
+                  {story.situation}
+                </p>
+                <div className="bg-red-950/50 border border-red-900/50 rounded-md p-3 mb-3">
+                  <div className="text-xs text-red-400 font-medium mb-1">
+                    결과
+                  </div>
+                  <p className="text-sm text-red-200 leading-relaxed">
+                    {story.consequence}
+                  </p>
+                </div>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  {story.lesson}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* Common Mistakes */}
       <Section title="흔한 실수">

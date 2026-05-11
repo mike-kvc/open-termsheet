@@ -24,7 +24,7 @@ export interface LegalIssue {
 }
 
 export interface LegalCheck {
-  applicable_laws: { name: string; relevance: string }[];
+  applicable_laws: { name: string; relevance: string; url?: string }[];
   risk_level: RiskLevel;
   issues: LegalIssue[];
 }
@@ -33,6 +33,13 @@ export interface Variant {
   type: string;
   market_position: MarketPosition;
   description: string;
+}
+
+export interface WarStory {
+  title: string;
+  situation: string;
+  consequence: string;
+  lesson: string;
 }
 
 export interface Clause {
@@ -48,4 +55,5 @@ export interface Clause {
   examples: Example[];
   legal_check: LegalCheck;
   common_mistakes: string[];
+  war_stories?: WarStory[];
 }
