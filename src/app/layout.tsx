@@ -49,6 +49,12 @@ export default function RootLayout({
                 분석기
               </Link>
               <Link
+                href="/simulator"
+                className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
+              >
+                시뮬레이터
+              </Link>
+              <Link
                 href="/laws"
                 className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
               >

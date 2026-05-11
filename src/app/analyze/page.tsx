@@ -156,6 +156,57 @@ const clauseKeywords: Record<string, string[]> = {
   ],
 };
 
+const glossary: Record<string, string> = {
+  "RCPS": "상환전환우선주. 전환권+상환권이 모두 있는 우선주로 한국 VC 투자의 표준",
+  "participating": "참가적. 원금 우선 회수 후 남은 금액에서도 지분만큼 추가 수령 (이중 취식)",
+  "non-participating": "비참가적. 원금 우선 회수 또는 지분 비례 배분 중 택 1",
+  "liquidation": "청산/잔여재산분배. 회사 매각·청산 시 투자금을 먼저 돌려받는 권리",
+  "anti-dilution": "희석방지. 다운라운드 시 기존 투자자의 전환가격을 조정하는 조항",
+  "full ratchet": "완전 희석방지. 다운라운드 가격 그대로 전환가격 적용. 창업자에게 매우 불리",
+  "가중평균": "Weighted Average. 다운라운드의 규모를 반영하여 전환가격 조정. 한국 표준",
+  "전환가격": "우선주를 보통주로 바꿀 때 적용되는 가격. Anti-dilution으로 조정될 수 있음",
+  "상환권": "투자자가 회사에 투자금 반환을 청구할 수 있는 권리. 배당가능이익 범위 내",
+  "풋옵션": "계약 위반 시 투자원금+연복리15%로 매수 청구. 배당가능이익 제한 없음",
+  "사전동의": "회사의 주요 경영사항에 대해 투자자의 서면 동의가 필요한 권리 (거부권)",
+  "ROFR": "Right of First Refusal. 주식 양도 시 투자자가 동일 조건으로 우선 매수할 수 있는 권리",
+  "Tag-Along": "동반매각요구권. 창업자가 주식을 팔 때 투자자도 같은 조건으로 함께 팔 수 있는 권리",
+  "Drag-Along": "동반매도청구권. 다수 주주가 소수 주주에게 매도를 강제할 수 있는 권리",
+  "Lock-up": "주식처분제한. 창업자가 동의 없이 주식을 팔거나 담보로 잡을 수 없는 조항",
+  "베스팅": "지분이 일정 기간에 걸쳐 확정되는 조건. 조기 퇴사 시 미확정 분 회수",
+  "클리프": "Cliff. 베스팅 시작 전 최소 근무 기간 (보통 1년). 이 기간 내 퇴사 시 지분 0",
+  "R&W": "Representations & Warranties. 회사 상태가 진실함을 보장하는 조항",
+  "CP": "Conditions Precedent. 선행조건. Closing 전에 충족해야 하는 전제조건",
+  "Closing": "거래종결. 투자금 납입 + 주권 교부 + 등기 완료",
+  "배당가능이익": "상법상 상환이 가능한 이익 범위. 초기 스타트업은 대부분 0원",
+  "간주청산": "M&A 등을 청산과 동일하게 취급하여 우선분배를 적용하는 조항",
+  "경업금지": "창업자가 회사와 경쟁하는 사업에 종사하는 것을 금지하는 조항",
+  "정관": "회사의 기본 규칙. 우선주 권리는 정관에 규정해야 법적 효력 발생",
+  "Pre-money": "투자 유치 전 기업가치. Post-money = Pre-money + 투자금",
+  "Post-money": "투자 유치 후 기업가치. 투자자 지분율 = 투자금 / Post-money",
+};
+
+function GlossaryTooltip({ keyword }: { keyword: string }) {
+  const explanation = glossary[keyword] || glossary[keyword.toLowerCase()];
+  if (!explanation) {
+    return (
+      <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
+        {keyword}
+      </span>
+    );
+  }
+  return (
+    <span className="relative group inline-block">
+      <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full cursor-help border-b border-dashed border-blue-300">
+        {keyword}
+      </span>
+      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-zinc-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 max-w-xs">
+        {explanation}
+        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-zinc-900" />
+      </span>
+    </span>
+  );
+}
+
 function analyzeText(text: string): MatchedClause[] {
   const normalizedText = text.toLowerCase();
   const results: MatchedClause[] = [];
@@ -370,6 +421,33 @@ export default function AnalyzePage() {
                 </p>
               </div>
 
+              {/* Critical alerts */}
+              {results.length > 0 && (
+                <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                  <h3 className="text-sm font-bold text-red-800 mb-3">
+                    이것만 확인하세요
+                  </h3>
+                  <div className="space-y-2">
+                    {results
+                      .filter(({ clause }) => clause.legal_check.risk_level !== "green")
+                      .slice(0, 3)
+                      .map(({ clause }) => (
+                        <div key={clause.id} className="flex items-start gap-2">
+                          <span className="text-red-500 shrink-0 mt-0.5">●</span>
+                          <div>
+                            <span className="text-sm font-medium text-red-800">
+                              {clause.name_ko}
+                            </span>
+                            <span className="text-xs text-red-600 ml-2">
+                              {clause.war_stories?.[0]?.title || clause.common_mistakes[0]}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 {results.map(({ clause, matchedKeywords }) => (
                   <div
@@ -387,12 +465,7 @@ export default function AnalyzePage() {
                           </h3>
                           <div className="flex flex-wrap gap-1 mt-2">
                             {matchedKeywords.map((kw) => (
-                              <span
-                                key={kw}
-                                className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full"
-                              >
-                                {kw}
-                              </span>
+                              <GlossaryTooltip key={kw} keyword={kw} />
                             ))}
                           </div>
                         </div>
