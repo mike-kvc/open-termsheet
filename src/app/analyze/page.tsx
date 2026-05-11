@@ -194,13 +194,83 @@ const riskLabel = {
   red: "높음",
 } as const;
 
+async function extractTextFromFile(file: File): Promise<string> {
+  const ext = file.name.split(".").pop()?.toLowerCase();
+
+  if (ext === "txt" || ext === "md") {
+    return file.text();
+  }
+
+  if (ext === "pdf") {
+    // PDF.js로 텍스트 추출
+    const pdfjsLib = await import("pdfjs-dist");
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const pages: string[] = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      pages.push(
+        content.items
+          .filter((item) => "str" in item)
+          .map((item) => (item as { str: string }).str)
+          .join(" ")
+      );
+    }
+    return pages.join("\n\n");
+  }
+
+  if (ext === "docx") {
+    // DOCX는 ZIP 안의 XML에서 텍스트 추출
+    const JSZip = (await import("jszip")).default;
+    const arrayBuffer = await file.arrayBuffer();
+    const zip = await JSZip.loadAsync(arrayBuffer);
+    const docXml = await zip.file("word/document.xml")?.async("string");
+    if (!docXml) return "";
+    // XML에서 텍스트만 추출
+    return docXml
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // HTML 파일
+  if (ext === "html" || ext === "htm") {
+    const html = await file.text();
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent || "";
+  }
+
+  return file.text();
+}
+
 export default function AnalyzePage() {
   const [input, setInput] = useState("");
   const [results, setResults] = useState<MatchedClause[] | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   function handleAnalyze() {
     if (!input.trim()) return;
     setResults(analyzeText(input));
+  }
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLoading(true);
+    setFileName(file.name);
+    try {
+      const text = await extractTextFromFile(file);
+      setInput(text);
+      setResults(analyzeText(text));
+    } catch {
+      alert("파일을 읽을 수 없습니다. 텍스트를 직접 붙여넣어 주세요.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -222,13 +292,39 @@ export default function AnalyzePage() {
         </p>
       </header>
 
-      {/* Input */}
+      {/* File Upload */}
+      <div className="mb-4">
+        <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-zinc-200 rounded-lg cursor-pointer hover:border-zinc-400 transition-colors">
+          <input
+            type="file"
+            accept=".pdf,.docx,.doc,.txt,.md,.html,.htm"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <div className="text-center">
+            {loading ? (
+              <p className="text-sm text-zinc-400">파일 읽는 중...</p>
+            ) : (
+              <>
+                <p className="text-sm text-zinc-500">
+                  PDF, DOCX, TXT 파일을 드래그하거나 클릭하여 업로드
+                </p>
+                {fileName && (
+                  <p className="text-xs text-zinc-400 mt-1">{fileName}</p>
+                )}
+              </>
+            )}
+          </div>
+        </label>
+      </div>
+
+      {/* Text Input */}
       <div className="mb-6">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="텀시트 또는 투자계약서 텍스트를 여기에 붙여넣으세요..."
-          className="w-full h-64 px-4 py-3 border border-zinc-200 rounded-lg text-sm font-mono leading-relaxed focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-300 resize-y"
+          placeholder="또는 텀시트/투자계약서 텍스트를 여기에 직접 붙여넣으세요..."
+          className="w-full h-48 px-4 py-3 border border-zinc-200 rounded-lg text-sm font-mono leading-relaxed focus:outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 placeholder:text-zinc-300 resize-y"
         />
         <div className="flex items-center justify-between mt-3">
           <span className="text-xs text-zinc-400">
