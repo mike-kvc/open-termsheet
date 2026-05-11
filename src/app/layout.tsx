@@ -37,10 +37,16 @@ export default function RootLayout({
             </Link>
             <nav className="flex items-center gap-4">
               <Link
+                href="/guide"
+                className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
+              >
+                가이드
+              </Link>
+              <Link
                 href="/analyze"
                 className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
               >
-                텀시트 분석
+                분석기
               </Link>
               <Link
                 href="/laws"
