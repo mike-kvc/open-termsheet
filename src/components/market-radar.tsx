@@ -35,6 +35,48 @@ const coreLpSources = [
   "한국벤처캐피탈협회",
 ];
 
+type StartupProfile = {
+  stage: "pre-seed" | "seed" | "series-a" | "growth";
+  sector: string;
+  roundSize: string;
+  geography: string;
+  traction: string;
+};
+
+type ScoredSignal = {
+  signal: LiveMarketSignal;
+  score: number;
+  reasons: string[];
+  action: {
+    label: string;
+    nextStep: string;
+    draft: string;
+    caution: string;
+  };
+};
+
+const stageLabels: Record<StartupProfile["stage"], string> = {
+  "pre-seed": "Pre-seed",
+  seed: "Seed",
+  "series-a": "Series A",
+  growth: "Growth",
+};
+
+const stageKeywords: Record<StartupProfile["stage"], string[]> = {
+  "pre-seed": ["예비", "초기", "창업", "seed", "시드", "tips", "팁스"],
+  seed: ["초기", "창업", "seed", "시드", "tips", "팁스", "액셀러레이팅"],
+  "series-a": ["성장", "스케일", "글로벌", "딥테크", "series", "a"],
+  growth: ["성장", "스케일", "글로벌", "세컨더리", "회수", "growth"],
+};
+
+const defaultProfile: StartupProfile = {
+  stage: "seed",
+  sector: "AI B2B SaaS",
+  roundSize: "20억",
+  geography: "한국",
+  traction: "유료 고객과 초기 매출 있음",
+};
+
 function formatGeneratedAt(value: string): string {
   return new Intl.DateTimeFormat("ko-KR", {
     dateStyle: "medium",
@@ -42,11 +84,102 @@ function formatGeneratedAt(value: string): string {
   }).format(new Date(value));
 }
 
+function tokenize(value: string): string[] {
+  return value
+    .toLowerCase()
+    .split(/[\s,./|·]+/)
+    .map((token) => token.trim())
+    .filter((token) => token.length >= 2);
+}
+
+function signalText(signal: LiveMarketSignal): string {
+  return [
+    signal.title,
+    signal.source,
+    signal.category,
+    signal.summary,
+    signal.relevance,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function scoreSignal(signal: LiveMarketSignal, profile: StartupProfile): ScoredSignal {
+  const text = signalText(signal);
+  const reasons: string[] = [];
+  let score = 0;
+
+  if (signal.type === "fund-of-funds") {
+    score += 32;
+    reasons.push("신규 펀드 결성/출자 맥락을 읽을 수 있음");
+  }
+
+  if (signal.type === "support-program") {
+    score += 18;
+    reasons.push("창업자가 직접 신청하거나 병행할 수 있는 프로그램");
+  }
+
+  if (coreLpSources.includes(signal.source)) {
+    score += 22;
+    reasons.push("핵심 LP 출자사업 소스");
+  }
+
+  const profileTokens = tokenize(
+    `${profile.sector} ${profile.geography} ${profile.traction}`
+  );
+  const matchedTokens = profileTokens.filter((token) => text.includes(token));
+  if (matchedTokens.length > 0) {
+    score += Math.min(30, matchedTokens.length * 10);
+    reasons.push(`프로필 키워드 매칭: ${matchedTokens.slice(0, 3).join(", ")}`);
+  }
+
+  const matchedStageKeywords = stageKeywords[profile.stage].filter((keyword) =>
+    text.includes(keyword)
+  );
+  if (matchedStageKeywords.length > 0) {
+    score += Math.min(20, matchedStageKeywords.length * 7);
+    reasons.push(`${stageLabels[profile.stage]} 단계 힌트 포함`);
+  }
+
+  if (profile.roundSize && signal.type === "fund-of-funds") {
+    score += 10;
+    reasons.push(`${profile.roundSize} 라운드 투자자 풀 확장 신호`);
+  }
+
+  const action =
+    signal.type === "fund-of-funds"
+      ? {
+          label: "VC 타겟 리스트에 반영",
+          nextStep:
+            "공고 원문에서 위탁운용사 선정 결과와 펀드 목적을 확인하고, 해당 운용사의 최근 투자 단계/섹터를 투자자 카드에 기록합니다.",
+          draft: `${stageLabels[profile.stage]} ${profile.sector} 라운드를 준비 중입니다. ${signal.source} 출자사업 맥락상 신규 펀드 결성 또는 위탁운용사 선정 흐름을 확인했고, 저희 라운드와의 fit을 검토하고 싶습니다. 관련 담당 파트너 또는 심사역 소개가 가능할지 여쭙습니다.`,
+          caution:
+            "출자 공고 자체는 VC의 실제 투자 가능성을 확정하지 않습니다. 선정 결과, 펀드 결성 완료 여부, 투자 기간을 원문으로 확인해야 합니다.",
+        }
+      : {
+          label: "지원/병행 자금 검토",
+          nextStep:
+            "마감일, 지원 대상, 요구 서류를 확인하고 현재 라운드 일정과 충돌하지 않으면 신청 체크리스트에 추가합니다.",
+          draft: `${profile.sector} ${stageLabels[profile.stage]} 팀입니다. 현재 ${profile.roundSize} 라운드와 병행 가능한 지원사업을 검토 중이며, ${signal.title}의 지원 대상과 제출 서류가 저희 상황에 맞는지 확인하고 싶습니다.`,
+          caution:
+            "지원사업은 투자자 매칭과 다르게 심사/행정 일정이 길 수 있습니다. 라운드 클로징 일정과 병행 가능성을 먼저 확인해야 합니다.",
+        };
+
+  return {
+    signal,
+    score,
+    reasons: reasons.slice(0, 4),
+    action,
+  };
+}
+
 export function MarketRadar() {
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [activeType, setActiveType] = useState<LiveSignalType | "all">("all");
   const [activeSource, setActiveSource] = useState<string | "all">("all");
+  const [profile, setProfile] = useState<StartupProfile>(defaultProfile);
   const [data, setData] = useState<LiveMarketRadarResponse | null>(null);
   const [saved, setSaved] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -110,6 +243,24 @@ export function MarketRadar() {
     }));
   }, [data]);
 
+  const scoredSignals = useMemo(() => {
+    const signals = data?.signals ?? [];
+    return signals
+      .map((signal) => scoreSignal(signal, profile))
+      .sort((a, b) => b.score - a.score);
+  }, [data, profile]);
+
+  const recommendedSignals = scoredSignals.slice(0, 3);
+
+  const savedSignals = useMemo(() => {
+    const savedIds = new Set(saved);
+    return scoredSignals.filter(({ signal }) => savedIds.has(signal.id));
+  }, [saved, scoredSignals]);
+
+  const scoredSignalById = useMemo(() => {
+    return new Map(scoredSignals.map((item) => [item.signal.id, item]));
+  }, [scoredSignals]);
+
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmittedQuery(query.trim());
@@ -121,6 +272,10 @@ export function MarketRadar() {
         ? current.filter((id) => id !== signal.id)
         : [...current, signal.id]
     );
+  };
+
+  const updateProfile = (field: keyof StartupProfile, value: string) => {
+    setProfile((current) => ({ ...current, [field]: value }));
   };
 
   return (
@@ -182,6 +337,154 @@ export function MarketRadar() {
             ))}
           </div>
         </div>
+      )}
+
+      <section className="mb-6 rounded-lg border border-zinc-200 p-4">
+        <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-sm font-medium">회사 프로필 기반 액션</h2>
+            <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+              같은 라이브 데이터라도 회사 단계, 섹터, 라운드 규모에 따라 우선순위와
+              다음 행동이 달라집니다.
+            </p>
+          </div>
+          <div className="text-xs text-zinc-400">
+            {data ? `${scoredSignals.length}개 신호 평가` : "데이터 대기 중"}
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-xs font-medium text-zinc-500">
+            단계
+            <select
+              value={profile.stage}
+              onChange={(event) => updateProfile("stage", event.target.value)}
+              className="mt-1 w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            >
+              {Object.entries(stageLabels).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs font-medium text-zinc-500">
+            섹터/키워드
+            <input
+              value={profile.sector}
+              onChange={(event) => updateProfile("sector", event.target.value)}
+              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            />
+          </label>
+          <label className="text-xs font-medium text-zinc-500">
+            목표 라운드 규모
+            <input
+              value={profile.roundSize}
+              onChange={(event) => updateProfile("roundSize", event.target.value)}
+              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            />
+          </label>
+          <label className="text-xs font-medium text-zinc-500">
+            지역/시장
+            <input
+              value={profile.geography}
+              onChange={(event) => updateProfile("geography", event.target.value)}
+              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            />
+          </label>
+          <label className="text-xs font-medium text-zinc-500 sm:col-span-2">
+            현재 traction
+            <input
+              value={profile.traction}
+              onChange={(event) => updateProfile("traction", event.target.value)}
+              className="mt-1 w-full rounded-md border border-zinc-200 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400"
+            />
+          </label>
+        </div>
+      </section>
+
+      {recommendedSignals.length > 0 && (
+        <section className="mb-6 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+          <div className="mb-3">
+            <h2 className="text-sm font-medium text-emerald-950">
+              지금 바로 할 액션
+            </h2>
+            <p className="mt-1 text-xs leading-relaxed text-emerald-800">
+              라이브 신호를 회사 프로필에 맞춰 점수화했습니다. 점수는 투자 가능성
+              확정이 아니라, 이번 주 리서치와 아웃리치 우선순위입니다.
+            </p>
+          </div>
+          <div className="space-y-3">
+            {recommendedSignals.map(({ signal, score, reasons, action }) => (
+              <article
+                key={signal.id}
+                className="rounded-md border border-emerald-200 bg-white p-4"
+              >
+                <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-emerald-700">
+                      {action.label} · 우선순위 {score}
+                    </p>
+                    <h3 className="mt-1 text-sm font-semibold leading-snug">
+                      {signal.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-zinc-500">{signal.source}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleSaved(signal)}
+                    className={`shrink-0 rounded-md border px-3 py-2 text-xs ${
+                      saved.includes(signal.id)
+                        ? "border-emerald-800 bg-emerald-800 text-white"
+                        : "border-emerald-200 text-emerald-800 hover:border-emerald-500"
+                    }`}
+                  >
+                    {saved.includes(signal.id) ? "실행 플랜에 있음" : "실행 플랜에 추가"}
+                  </button>
+                </div>
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {reasons.map((reason) => (
+                    <span
+                      key={reason}
+                      className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800"
+                    >
+                      {reason}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-sm leading-relaxed text-zinc-700">
+                  <span className="font-medium">다음 행동: </span>
+                  {action.nextStep}
+                </p>
+                <div className="mt-3 rounded-md bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-600">
+                  <div className="mb-1 font-medium text-zinc-900">
+                    소개 요청/문의 초안
+                  </div>
+                  {action.draft}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {savedSignals.length > 0 && (
+        <section className="mb-6 rounded-lg border border-zinc-200 p-4">
+          <h2 className="text-sm font-medium">이번 주 실행 플랜</h2>
+          <div className="mt-3 space-y-3">
+            {savedSignals.map(({ signal, action }) => (
+              <div
+                key={signal.id}
+                className="rounded-md border border-zinc-200 p-3 text-sm"
+              >
+                <div className="font-medium">{signal.title}</div>
+                <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+                  {action.nextStep}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       <div className="mb-6 flex flex-wrap gap-2">
@@ -310,6 +613,11 @@ export function MarketRadar() {
                 <p className="mb-3 text-sm leading-relaxed text-zinc-600">
                   {signal.relevance}
                 </p>
+                {scoredSignalById.get(signal.id) && (
+                  <p className="mb-3 text-xs leading-relaxed text-zinc-500">
+                    {scoredSignalById.get(signal.id)?.action.caution}
+                  </p>
+                )}
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs text-zinc-400">{signal.summary}</p>
                   <a

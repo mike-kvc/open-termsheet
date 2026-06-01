@@ -2,16 +2,17 @@ import { MarketRadar } from "@/components/market-radar";
 
 export default function MarketPage() {
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-4xl px-6 py-12">
       <header className="mb-10">
-        <p className="mb-2 text-sm font-medium text-blue-600">라이브 레이더</p>
+        <p className="mb-2 text-sm font-medium text-blue-600">펀딩 실행 워크벤치</p>
         <h1 className="mb-3 text-3xl font-bold tracking-tight">
-          펀딩 기회와 투자자 신호
+          라이브 신호에서 이번 주 액션까지
         </h1>
         <p className="text-lg leading-relaxed text-zinc-500">
           지금 열려 있는 창업지원사업, 액셀러레이션, LP 출자 공고, 펀드 결성
           신호를 한곳에서 확인합니다. 한국벤처투자, 산업은행, 성장금융, KVCA 등
-          주요 출자사업 공고를 실제 출처에서 가져와 펀딩 준비 우선순위를 잡습니다.
+          주요 출자사업 공고를 실제 출처에서 가져오고, 회사 프로필에 맞춰
+          투자자 리서치와 아웃리치 우선순위를 잡습니다.
         </p>
       </header>
 
@@ -27,8 +28,8 @@ export default function MarketPage() {
         </h2>
         <p className="text-sm leading-relaxed text-amber-800">
           지원사업은 창업자가 바로 신청 여부를 판단할 항목이고, 출자 공고는
-          투자자의 신규 펀드 결성 맥락을 읽는 신호입니다. 뉴스와 공시는 API 키가
-          설정되면 추가로 붙습니다.
+          투자자의 신규 펀드 결성 맥락을 읽는 신호입니다. 회사 프로필을 바꾸면
+          우선순위, 다음 행동, 소개 요청 초안이 함께 바뀝니다.
         </p>
       </section>
 
