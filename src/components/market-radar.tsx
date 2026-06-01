@@ -9,7 +9,14 @@ import type {
 
 type StartupStage = "pre-seed" | "seed" | "series-a" | "growth";
 type TargetStatus = "research" | "intro" | "meeting" | "terms";
-type WorkspaceTab = "targets" | "evidence" | "drafts";
+type WorkspaceTab = "targets" | "directory" | "evidence" | "drafts";
+type InvestorKind =
+  | "VC"
+  | "초기투자"
+  | "AC"
+  | "CVC"
+  | "성장투자"
+  | "전략/금융";
 
 type StartupProfile = {
   stage: StartupStage;
@@ -22,6 +29,7 @@ type StartupProfile = {
 type InvestorTarget = {
   id: string;
   name: string;
+  kind: InvestorKind;
   role: "lead 후보" | "초기 리드/공동투자" | "팔로우온 후보" | "전략적 후보";
   status: TargetStatus;
   stageFit: StartupStage[];
@@ -52,6 +60,16 @@ const statusLabels: Record<TargetStatus, string> = {
   terms: "조건 검토",
 };
 
+const investorKinds: Array<InvestorKind | "전체"> = [
+  "전체",
+  "VC",
+  "초기투자",
+  "AC",
+  "CVC",
+  "성장투자",
+  "전략/금융",
+];
+
 const typeLabels: Record<LiveSignalType, string> = {
   "support-program": "지원사업",
   "fund-of-funds": "출자/펀드",
@@ -78,6 +96,7 @@ const seedTargets: InvestorTarget[] = [
   {
     id: "kakao-ventures",
     name: "Kakao Ventures",
+    kind: "초기투자",
     role: "초기 리드/공동투자",
     status: "intro",
     stageFit: ["pre-seed", "seed", "series-a"],
@@ -89,6 +108,7 @@ const seedTargets: InvestorTarget[] = [
   {
     id: "bonangels",
     name: "BonAngels",
+    kind: "초기투자",
     role: "초기 리드/공동투자",
     status: "intro",
     stageFit: ["pre-seed", "seed"],
@@ -100,6 +120,7 @@ const seedTargets: InvestorTarget[] = [
   {
     id: "futureplay",
     name: "FuturePlay",
+    kind: "AC",
     role: "초기 리드/공동투자",
     status: "research",
     stageFit: ["pre-seed", "seed", "series-a"],
@@ -111,6 +132,7 @@ const seedTargets: InvestorTarget[] = [
   {
     id: "bass-investment",
     name: "Bass Investment",
+    kind: "VC",
     role: "lead 후보",
     status: "meeting",
     stageFit: ["seed", "series-a"],
@@ -122,6 +144,7 @@ const seedTargets: InvestorTarget[] = [
   {
     id: "dsc-investment",
     name: "DSC Investment",
+    kind: "VC",
     role: "lead 후보",
     status: "research",
     stageFit: ["seed", "series-a", "growth"],
@@ -133,6 +156,7 @@ const seedTargets: InvestorTarget[] = [
   {
     id: "korea-investment-partners",
     name: "Korea Investment Partners",
+    kind: "성장투자",
     role: "팔로우온 후보",
     status: "research",
     stageFit: ["series-a", "growth"],
@@ -140,6 +164,210 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자 소개, 성장 라운드 공동투자자 경유",
     check: "Series A 이후 지표와 글로벌 확장 스토리 필요",
     termLens: "대형 라운드에서 liquidation preference와 veto scope 확인",
+  },
+  {
+    id: "altos-ventures",
+    name: "Altos Ventures",
+    kind: "성장투자",
+    role: "lead 후보",
+    status: "research",
+    stageFit: ["series-a", "growth"],
+    sectors: ["ai", "b2b", "saas", "consumer", "commerce", "software"],
+    route: "기존 투자자, 글로벌 SaaS/consumer founder, 공동투자 VC 경유",
+    check: "강한 retention, category leadership, 글로벌 확장 가능성을 확인",
+    termLens: "대형 리드 투자자의 preference, veto, information rights 범위 확인",
+  },
+  {
+    id: "sbva",
+    name: "SBVA",
+    kind: "성장투자",
+    role: "lead 후보",
+    status: "research",
+    stageFit: ["series-a", "growth"],
+    sectors: ["ai", "software", "deeptech", "global", "platform"],
+    route: "성장 라운드 공동투자자 또는 글로벌 네트워크 경유",
+    check: "글로벌 확장 thesis와 라운드 리드 가능성을 확인",
+    termLens: "해외 투자자 참여 시 준거법, 정보권, 후속투자 권리를 점검",
+  },
+  {
+    id: "imm-investment",
+    name: "IMM Investment",
+    kind: "성장투자",
+    role: "팔로우온 후보",
+    status: "research",
+    stageFit: ["series-a", "growth"],
+    sectors: ["ai", "software", "bio", "commerce", "platform"],
+    route: "기존 투자자 또는 성장 라운드 lead 후보 경유",
+    check: "라운드 규모, 재무 지표, 회수 가능성 관점 자료를 준비",
+    termLens: "상환권, drag/tag, 보호조항의 범위를 집중 검토",
+  },
+  {
+    id: "lb-investment",
+    name: "LB Investment",
+    kind: "VC",
+    role: "lead 후보",
+    status: "research",
+    stageFit: ["seed", "series-a", "growth"],
+    sectors: ["ai", "software", "bio", "contents", "commerce"],
+    route: "공동투자 VC, 산업 전문가, 기존 포트폴리오 경유",
+    check: "펀드별 투자 단계와 담당 심사역 sector fit 확인",
+    termLens: "리드 투자 구조와 board/observer 권리 범위 확인",
+  },
+  {
+    id: "stonebridge-ventures",
+    name: "Stonebridge Ventures",
+    kind: "VC",
+    role: "lead 후보",
+    status: "research",
+    stageFit: ["seed", "series-a", "growth"],
+    sectors: ["ai", "deeptech", "software", "bio", "platform"],
+    route: "공동투자자 또는 sector advisor 경유",
+    check: "기술/시장 양쪽에서 투자 thesis가 맞는지 확인",
+    termLens: "기술기업 투자 시 IP 진술보장과 보호조항을 분리 검토",
+  },
+  {
+    id: "atinum-investment",
+    name: "Atinum Investment",
+    kind: "성장투자",
+    role: "팔로우온 후보",
+    status: "research",
+    stageFit: ["series-a", "growth"],
+    sectors: ["ai", "software", "bio", "platform", "global"],
+    route: "기존 투자자, 성장 라운드 lead, 포트폴리오 founder 경유",
+    check: "후속 라운드 규모와 성장 지표가 투자 기준에 맞는지 확인",
+    termLens: "대형 라운드의 liquidation stack과 후속투자 권리 확인",
+  },
+  {
+    id: "premier-partners",
+    name: "Premier Partners",
+    kind: "성장투자",
+    role: "팔로우온 후보",
+    status: "research",
+    stageFit: ["series-a", "growth"],
+    sectors: ["software", "bio", "contents", "commerce", "platform"],
+    route: "기존 투자자 또는 later-stage 공동투자자 경유",
+    check: "성장성, 수익성 전환 경로, exit scenario를 준비",
+    termLens: "상환권과 drag-along 조건의 발동 요건을 확인",
+  },
+  {
+    id: "capstone-partners",
+    name: "Capstone Partners",
+    kind: "VC",
+    role: "초기 리드/공동투자",
+    status: "research",
+    stageFit: ["pre-seed", "seed", "series-a"],
+    sectors: ["ai", "b2b", "saas", "software", "commerce"],
+    route: "초기투자자, accelerator, 포트폴리오 founder 경유",
+    check: "초기 고객 검증과 시장 진입 전략을 확인",
+    termLens: "초기 우선주 조건과 후속투자 권리 범위 확인",
+  },
+  {
+    id: "mashup-ventures",
+    name: "Mashup Ventures",
+    kind: "초기투자",
+    role: "초기 리드/공동투자",
+    status: "intro",
+    stageFit: ["pre-seed", "seed"],
+    sectors: ["ai", "consumer", "b2b", "saas", "software"],
+    route: "founder referral, 커뮤니티, 초기 투자자 경유",
+    check: "팀과 시장 선택의 sharpness를 짧게 정리",
+    termLens: "초기 라운드 dilution, pro-rata, 정보권을 단순하게 유지",
+  },
+  {
+    id: "bluepoint",
+    name: "Bluepoint Partners",
+    kind: "AC",
+    role: "초기 리드/공동투자",
+    status: "research",
+    stageFit: ["pre-seed", "seed", "series-a"],
+    sectors: ["deeptech", "ai", "hardware", "bio", "software"],
+    route: "기술 창업 네트워크, 연구자, accelerator 프로그램 경유",
+    check: "기술 검증, PoC, 사업화 경로를 확인",
+    termLens: "기술 자문/보육 기대와 투자 조건을 분리",
+  },
+  {
+    id: "primer",
+    name: "Primer",
+    kind: "AC",
+    role: "초기 리드/공동투자",
+    status: "intro",
+    stageFit: ["pre-seed", "seed"],
+    sectors: ["consumer", "b2b", "saas", "commerce", "software"],
+    route: "창업자 커뮤니티, batch alumni, angel network 경유",
+    check: "문제 정의와 초기 사용자 반응을 간결하게 준비",
+    termLens: "초기 투자 조건과 후속 투자자 권리 충돌 가능성 확인",
+  },
+  {
+    id: "springcamp",
+    name: "SpringCamp",
+    kind: "초기투자",
+    role: "초기 리드/공동투자",
+    status: "research",
+    stageFit: ["pre-seed", "seed"],
+    sectors: ["ai", "software", "consumer", "b2b", "saas"],
+    route: "초기 founder referral, 커뮤니티, 공동투자자 경유",
+    check: "팀 역량과 초기 시장 검증 자료를 확인",
+    termLens: "SAFE/우선주 구조와 후속 라운드 전환 조건 확인",
+  },
+  {
+    id: "naver-d2sf",
+    name: "NAVER D2SF",
+    kind: "CVC",
+    role: "전략적 후보",
+    status: "research",
+    stageFit: ["pre-seed", "seed", "series-a"],
+    sectors: ["ai", "deeptech", "software", "robotics", "content"],
+    route: "기술/제품 협력 접점, D2SF 프로그램, 연구자 네트워크 경유",
+    check: "전략적 협업 가능성과 독립적 투자 thesis를 분리 확인",
+    termLens: "사업협력, 독점, 우선협상권이 투자 조건에 섞이는지 점검",
+  },
+  {
+    id: "kakao-investment",
+    name: "Kakao Investment",
+    kind: "CVC",
+    role: "전략적 후보",
+    status: "research",
+    stageFit: ["seed", "series-a", "growth"],
+    sectors: ["ai", "consumer", "content", "commerce", "platform"],
+    route: "사업부 협력 접점, 공동투자자, 포트폴리오 경유",
+    check: "전략적 fit과 순수 재무투자 가능성을 분리 확인",
+    termLens: "사업 제휴 조항과 투자자 권리 조항을 별도 문서로 관리",
+  },
+  {
+    id: "lotte-ventures",
+    name: "Lotte Ventures",
+    kind: "CVC",
+    role: "전략적 후보",
+    status: "research",
+    stageFit: ["seed", "series-a"],
+    sectors: ["commerce", "food", "consumer", "logistics", "software"],
+    route: "사업부 PoC, 오픈이노베이션, CVC 네트워크 경유",
+    check: "PoC 가능성과 투자 의사결정 라인을 분리 확인",
+    termLens: "PoC/상업계약과 투자 조건의 의존성을 낮춤",
+  },
+  {
+    id: "shinhan-venture-investment",
+    name: "Shinhan Venture Investment",
+    kind: "전략/금융",
+    role: "팔로우온 후보",
+    status: "research",
+    stageFit: ["seed", "series-a", "growth"],
+    sectors: ["fintech", "ai", "software", "commerce", "platform"],
+    route: "금융권 사업협력 접점, 공동투자자, 기존 투자자 경유",
+    check: "금융 규제/사업협력 fit과 투자 thesis를 분리 확인",
+    termLens: "전략적 권리, 정보 접근, 규제 관련 진술보장 범위 확인",
+  },
+  {
+    id: "kb-investment",
+    name: "KB Investment",
+    kind: "전략/금융",
+    role: "팔로우온 후보",
+    status: "research",
+    stageFit: ["seed", "series-a", "growth"],
+    sectors: ["fintech", "ai", "software", "bio", "platform"],
+    route: "기존 투자자, 금융권 협력 접점, 공동투자자 경유",
+    check: "라운드 규모와 금융/비금융 투자 thesis를 확인",
+    termLens: "정보권, 후속투자권, 전략 협업 조항의 범위 확인",
   },
 ];
 
@@ -229,6 +457,9 @@ export function MarketRadar() {
   const [data, setData] = useState<LiveMarketRadarResponse | null>(null);
   const [selectedTargetId, setSelectedTargetId] = useState(seedTargets[0].id);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("targets");
+  const [directoryQuery, setDirectoryQuery] = useState("");
+  const [activeInvestorKind, setActiveInvestorKind] =
+    useState<InvestorKind | "전체">("전체");
   const [savedTargetIds, setSavedTargetIds] = useState<string[]>([
     seedTargets[0].id,
     seedTargets[3].id,
@@ -279,6 +510,28 @@ export function MarketRadar() {
   const savedTargets = scoredTargets.filter((target) =>
     savedTargetIds.includes(target.id)
   );
+
+  const directoryTargets = scoredTargets.filter((target) => {
+    const query = directoryQuery.trim().toLowerCase();
+    const kindMatches =
+      activeInvestorKind === "전체" || target.kind === activeInvestorKind;
+    const queryMatches =
+      !query ||
+      [
+        target.name,
+        target.kind,
+        target.role,
+        target.route,
+        target.check,
+        target.termLens,
+        target.sectors.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+
+    return kindMatches && queryMatches;
+  });
 
   const evidenceSignals = signals
     .filter((signal) =>
@@ -430,6 +683,7 @@ export function MarketRadar() {
       <div className="flex flex-wrap gap-2">
         {[
           ["targets", "투자자 타겟"],
+          ["directory", "투자자 찾기"],
           ["evidence", "근거 inbox"],
           ["drafts", "아웃리치/조건"],
         ].map(([key, label]) => (
@@ -505,6 +759,101 @@ export function MarketRadar() {
               </div>
             </article>
           ))}
+        </section>
+      )}
+
+      {activeTab === "directory" && (
+        <section className="rounded-lg border border-zinc-200 p-4">
+          <div className="mb-4 flex flex-col gap-3">
+            <div>
+              <h2 className="text-sm font-semibold">한국 투자자 디렉토리</h2>
+              <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+                VC, 초기투자, AC, CVC, 성장투자, 금융권 투자자를 한곳에서
+                검색합니다. 현재는 product seed이고, 다음 단계에서 KVCA/THE VC 등
+                외부 데이터로 검증/확장해야 합니다.
+              </p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <input
+                value={directoryQuery}
+                onChange={(event) => setDirectoryQuery(event.target.value)}
+                placeholder="투자자명, 섹터, 단계, 키워드 검색"
+                className="w-full rounded-md border border-zinc-200 px-3 py-2 text-sm text-zinc-900"
+              />
+              <div className="flex flex-wrap gap-2">
+                {investorKinds.map((kind) => (
+                  <button
+                    key={kind}
+                    type="button"
+                    onClick={() => setActiveInvestorKind(kind)}
+                    className={`rounded-full border px-3 py-1.5 text-xs ${
+                      activeInvestorKind === kind
+                        ? "border-zinc-900 bg-zinc-900 text-white"
+                        : "border-zinc-200 bg-white text-zinc-600"
+                    }`}
+                  >
+                    {kind}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-3 lg:grid-cols-2">
+            {directoryTargets.map((target) => (
+              <article
+                key={target.id}
+                className="rounded-md border border-zinc-200 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-blue-600">
+                      {target.kind} · {target.role}
+                    </p>
+                    <h3 className="mt-1 text-base font-semibold">
+                      {target.name}
+                    </h3>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xl font-semibold">{target.score}</div>
+                    <div className="text-xs text-zinc-400">match</div>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {target.sectors.slice(0, 5).map((sector) => (
+                    <span
+                      key={sector}
+                      className="rounded-full bg-zinc-100 px-2 py-1 text-xs text-zinc-600"
+                    >
+                      {sector}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-zinc-500">
+                  {target.check}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedTargetId(target.id);
+                      setActiveTab("drafts");
+                    }}
+                    className="rounded-md bg-zinc-900 px-3 py-2 text-xs font-medium text-white"
+                  >
+                    아웃리치 보기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleSavedTarget(target.id)}
+                    className="rounded-md border border-zinc-200 px-3 py-2 text-xs text-zinc-600"
+                  >
+                    {savedTargetIds.includes(target.id) ? "큐에서 제거" : "큐에 추가"}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
       )}
 
