@@ -17,6 +17,15 @@ type InvestorKind =
   | "CVC"
   | "성장투자"
   | "전략/금융";
+type VerificationLevel = "seed" | "source-candidate" | "source-backed";
+
+type DirectorySource = {
+  id: string;
+  name: string;
+  bestFor: string;
+  status: "live" | "identified" | "needs-license";
+  url: string;
+};
 
 type StartupProfile = {
   stage: StartupStage;
@@ -37,6 +46,8 @@ type InvestorTarget = {
   route: string;
   check: string;
   termLens: string;
+  verification: VerificationLevel;
+  sourceIds: string[];
 };
 
 type ScoredTarget = InvestorTarget & {
@@ -68,6 +79,44 @@ const investorKinds: Array<InvestorKind | "전체"> = [
   "CVC",
   "성장투자",
   "전략/금융",
+];
+
+const directorySources: DirectorySource[] = [
+  {
+    id: "kvca",
+    name: "KVCA 회원사",
+    bestFor: "국내 VC/운용사 기본 명부",
+    status: "identified",
+    url: "https://www.kvca.or.kr/",
+  },
+  {
+    id: "k-startup-ac",
+    name: "K-Startup 창업기획자 등록",
+    bestFor: "등록 액셀러레이터/AC 확인",
+    status: "identified",
+    url: "https://www.k-startup.go.kr/",
+  },
+  {
+    id: "tips",
+    name: "TIPS 운영사",
+    bestFor: "초기 투자·보육 운영사 확인",
+    status: "identified",
+    url: "https://www.jointips.or.kr/",
+  },
+  {
+    id: "pe-vc-lp",
+    name: "PE/VC/LP 출자 공고",
+    bestFor: "신규 펀드/LP 출자 신호",
+    status: "live",
+    url: "https://pe-vc-lp.com/",
+  },
+  {
+    id: "the-vc",
+    name: "THE VC",
+    bestFor: "투자 이력/포트폴리오/담당자 보강",
+    status: "needs-license",
+    url: "https://thevc.kr/",
+  },
 ];
 
 const typeLabels: Record<LiveSignalType, string> = {
@@ -104,6 +153,8 @@ const seedTargets: InvestorTarget[] = [
     route: "포트폴리오 창업자 또는 공동투자 VC 경유 소개 요청",
     check: "최근 동일 섹터 투자와 담당 파트너를 확인",
     termLens: "초기 투자자라 후속 라운드 권리와 pro-rata 조항을 먼저 점검",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "bonangels",
@@ -116,6 +167,8 @@ const seedTargets: InvestorTarget[] = [
     route: "창업자 네트워크, 엔젤 투자자, 기존 포트폴리오 경유",
     check: "팀/제품 검증 단계에서 설득 가능한 traction narrative 준비",
     termLens: "초기 라운드 valuation cap, 우선주 조건, 동반투자 구조 확인",
+    verification: "source-candidate",
+    sourceIds: ["tips", "the-vc"],
   },
   {
     id: "futureplay",
@@ -128,6 +181,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기술 자문자, accelerator 네트워크, 포트폴리오 경유",
     check: "기술 차별성과 초기 고객 검증 자료를 한 장으로 정리",
     termLens: "기술/IP 관련 진술보장과 후속 사업협력 기대치를 분리",
+    verification: "source-candidate",
+    sourceIds: ["k-startup-ac", "tips", "the-vc"],
   },
   {
     id: "bass-investment",
@@ -140,6 +195,8 @@ const seedTargets: InvestorTarget[] = [
     route: "공동투자 VC, founder referral, 기존 고객/파트너 경유",
     check: "매출 성장률, retention, sales pipeline 근거를 먼저 확인",
     termLens: "리드 투자 조건, board seat, follow-on reserve 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "dsc-investment",
@@ -152,6 +209,8 @@ const seedTargets: InvestorTarget[] = [
     route: "산업 전문가, 공동투자 VC, 심사역 직접 접점 탐색",
     check: "라운드 규모와 리드 가능성, 펀드별 투자 단계 확인",
     termLens: "보호조항, 이사회 구성, 후속투자 권리를 집중 검토",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "korea-investment-partners",
@@ -164,6 +223,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자 소개, 성장 라운드 공동투자자 경유",
     check: "Series A 이후 지표와 글로벌 확장 스토리 필요",
     termLens: "대형 라운드에서 liquidation preference와 veto scope 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "altos-ventures",
@@ -176,6 +237,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자, 글로벌 SaaS/consumer founder, 공동투자 VC 경유",
     check: "강한 retention, category leadership, 글로벌 확장 가능성을 확인",
     termLens: "대형 리드 투자자의 preference, veto, information rights 범위 확인",
+    verification: "source-candidate",
+    sourceIds: ["the-vc"],
   },
   {
     id: "sbva",
@@ -188,6 +251,8 @@ const seedTargets: InvestorTarget[] = [
     route: "성장 라운드 공동투자자 또는 글로벌 네트워크 경유",
     check: "글로벌 확장 thesis와 라운드 리드 가능성을 확인",
     termLens: "해외 투자자 참여 시 준거법, 정보권, 후속투자 권리를 점검",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "imm-investment",
@@ -200,6 +265,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자 또는 성장 라운드 lead 후보 경유",
     check: "라운드 규모, 재무 지표, 회수 가능성 관점 자료를 준비",
     termLens: "상환권, drag/tag, 보호조항의 범위를 집중 검토",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "lb-investment",
@@ -212,6 +279,8 @@ const seedTargets: InvestorTarget[] = [
     route: "공동투자 VC, 산업 전문가, 기존 포트폴리오 경유",
     check: "펀드별 투자 단계와 담당 심사역 sector fit 확인",
     termLens: "리드 투자 구조와 board/observer 권리 범위 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "stonebridge-ventures",
@@ -224,6 +293,8 @@ const seedTargets: InvestorTarget[] = [
     route: "공동투자자 또는 sector advisor 경유",
     check: "기술/시장 양쪽에서 투자 thesis가 맞는지 확인",
     termLens: "기술기업 투자 시 IP 진술보장과 보호조항을 분리 검토",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "atinum-investment",
@@ -236,6 +307,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자, 성장 라운드 lead, 포트폴리오 founder 경유",
     check: "후속 라운드 규모와 성장 지표가 투자 기준에 맞는지 확인",
     termLens: "대형 라운드의 liquidation stack과 후속투자 권리 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "premier-partners",
@@ -248,6 +321,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자 또는 later-stage 공동투자자 경유",
     check: "성장성, 수익성 전환 경로, exit scenario를 준비",
     termLens: "상환권과 drag-along 조건의 발동 요건을 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "capstone-partners",
@@ -260,6 +335,8 @@ const seedTargets: InvestorTarget[] = [
     route: "초기투자자, accelerator, 포트폴리오 founder 경유",
     check: "초기 고객 검증과 시장 진입 전략을 확인",
     termLens: "초기 우선주 조건과 후속투자 권리 범위 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "tips", "the-vc"],
   },
   {
     id: "mashup-ventures",
@@ -272,6 +349,8 @@ const seedTargets: InvestorTarget[] = [
     route: "founder referral, 커뮤니티, 초기 투자자 경유",
     check: "팀과 시장 선택의 sharpness를 짧게 정리",
     termLens: "초기 라운드 dilution, pro-rata, 정보권을 단순하게 유지",
+    verification: "source-candidate",
+    sourceIds: ["tips", "the-vc"],
   },
   {
     id: "bluepoint",
@@ -284,6 +363,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기술 창업 네트워크, 연구자, accelerator 프로그램 경유",
     check: "기술 검증, PoC, 사업화 경로를 확인",
     termLens: "기술 자문/보육 기대와 투자 조건을 분리",
+    verification: "source-candidate",
+    sourceIds: ["k-startup-ac", "tips", "the-vc"],
   },
   {
     id: "primer",
@@ -296,6 +377,8 @@ const seedTargets: InvestorTarget[] = [
     route: "창업자 커뮤니티, batch alumni, angel network 경유",
     check: "문제 정의와 초기 사용자 반응을 간결하게 준비",
     termLens: "초기 투자 조건과 후속 투자자 권리 충돌 가능성 확인",
+    verification: "source-candidate",
+    sourceIds: ["k-startup-ac", "tips", "the-vc"],
   },
   {
     id: "springcamp",
@@ -308,6 +391,8 @@ const seedTargets: InvestorTarget[] = [
     route: "초기 founder referral, 커뮤니티, 공동투자자 경유",
     check: "팀 역량과 초기 시장 검증 자료를 확인",
     termLens: "SAFE/우선주 구조와 후속 라운드 전환 조건 확인",
+    verification: "source-candidate",
+    sourceIds: ["the-vc"],
   },
   {
     id: "naver-d2sf",
@@ -320,6 +405,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기술/제품 협력 접점, D2SF 프로그램, 연구자 네트워크 경유",
     check: "전략적 협업 가능성과 독립적 투자 thesis를 분리 확인",
     termLens: "사업협력, 독점, 우선협상권이 투자 조건에 섞이는지 점검",
+    verification: "source-candidate",
+    sourceIds: ["the-vc"],
   },
   {
     id: "kakao-investment",
@@ -332,6 +419,8 @@ const seedTargets: InvestorTarget[] = [
     route: "사업부 협력 접점, 공동투자자, 포트폴리오 경유",
     check: "전략적 fit과 순수 재무투자 가능성을 분리 확인",
     termLens: "사업 제휴 조항과 투자자 권리 조항을 별도 문서로 관리",
+    verification: "source-candidate",
+    sourceIds: ["the-vc"],
   },
   {
     id: "lotte-ventures",
@@ -344,6 +433,8 @@ const seedTargets: InvestorTarget[] = [
     route: "사업부 PoC, 오픈이노베이션, CVC 네트워크 경유",
     check: "PoC 가능성과 투자 의사결정 라인을 분리 확인",
     termLens: "PoC/상업계약과 투자 조건의 의존성을 낮춤",
+    verification: "source-candidate",
+    sourceIds: ["the-vc"],
   },
   {
     id: "shinhan-venture-investment",
@@ -356,6 +447,8 @@ const seedTargets: InvestorTarget[] = [
     route: "금융권 사업협력 접점, 공동투자자, 기존 투자자 경유",
     check: "금융 규제/사업협력 fit과 투자 thesis를 분리 확인",
     termLens: "전략적 권리, 정보 접근, 규제 관련 진술보장 범위 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
   {
     id: "kb-investment",
@@ -368,6 +461,8 @@ const seedTargets: InvestorTarget[] = [
     route: "기존 투자자, 금융권 협력 접점, 공동투자자 경유",
     check: "라운드 규모와 금융/비금융 투자 thesis를 확인",
     termLens: "정보권, 후속투자권, 전략 협업 조항의 범위 확인",
+    verification: "source-candidate",
+    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
   },
 ];
 
@@ -388,6 +483,20 @@ function tokenize(value: string): string[] {
 
 function isCoreLpSignal(signal: LiveMarketSignal): boolean {
   return coreLpSources.includes(signal.source) || signal.type === "fund-of-funds";
+}
+
+function sourceNames(sourceIds: string[]): string {
+  return sourceIds
+    .map((sourceId) => directorySources.find((source) => source.id === sourceId))
+    .filter(Boolean)
+    .map((source) => source?.name)
+    .join(", ");
+}
+
+function verificationLabel(level: VerificationLevel): string {
+  if (level === "source-backed") return "source-backed";
+  if (level === "source-candidate") return "source candidate";
+  return "seed";
 }
 
 function scoreTarget(
@@ -521,6 +630,8 @@ export function MarketRadar() {
         target.name,
         target.kind,
         target.role,
+        target.verification,
+        sourceNames(target.sourceIds),
         target.route,
         target.check,
         target.termLens,
@@ -726,6 +837,9 @@ export function MarketRadar() {
                 </div>
               </div>
               <div className="mb-3 flex flex-wrap gap-2">
+                <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs text-emerald-700">
+                  {verificationLabel(target.verification)}
+                </span>
                 {target.reasons.map((reason) => (
                   <span
                     key={reason}
@@ -737,6 +851,9 @@ export function MarketRadar() {
               </div>
               <p className="text-sm leading-relaxed text-zinc-600">
                 {target.nextAction}
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+                Sources: {sourceNames(target.sourceIds)}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
@@ -772,6 +889,35 @@ export function MarketRadar() {
                 검색합니다. 현재는 product seed이고, 다음 단계에서 KVCA/THE VC 등
                 외부 데이터로 검증/확장해야 합니다.
               </p>
+            </div>
+            <div className="grid gap-2 md:grid-cols-5">
+              {directorySources.map((source) => (
+                <a
+                  key={source.id}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md border border-zinc-200 p-3 hover:border-zinc-400"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold">{source.name}</span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] ${
+                        source.status === "live"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : source.status === "identified"
+                            ? "bg-blue-50 text-blue-700"
+                            : "bg-amber-50 text-amber-700"
+                      }`}
+                    >
+                      {source.status}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs leading-relaxed text-zinc-500">
+                    {source.bestFor}
+                  </p>
+                </a>
+              ))}
             </div>
             <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
               <input
@@ -820,6 +966,9 @@ export function MarketRadar() {
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-emerald-50 px-2 py-1 text-xs text-emerald-700">
+                    {verificationLabel(target.verification)}
+                  </span>
                   {target.sectors.slice(0, 5).map((sector) => (
                     <span
                       key={sector}
@@ -831,6 +980,9 @@ export function MarketRadar() {
                 </div>
                 <p className="mt-3 text-xs leading-relaxed text-zinc-500">
                   {target.check}
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-zinc-400">
+                  Sources: {sourceNames(target.sourceIds)}
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button

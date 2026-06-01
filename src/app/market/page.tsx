@@ -11,15 +11,15 @@ export default function MarketPage() {
           누구에게 연락할지 먼저 정합니다
         </h1>
         <p className="text-lg leading-relaxed text-zinc-500">
-          펀딩 준비의 첫 화면은 공고 목록이 아니라 한국 투자자 디렉토리와 타겟
-          리스트여야 합니다. VC, 초기투자사, AC, CVC, 성장투자자를 찾고, 라이브
-          출자사업과 지원사업 데이터는 뒤에서 근거로 붙입니다.
+          펀딩 준비의 첫 화면은 공고 목록이 아니라 source-backed 한국 투자자
+          디렉토리와 타겟 리스트여야 합니다. VC, 초기투자사, AC, CVC, 성장투자자를
+          찾고, KVCA·K-Startup·TIPS·PE/VC/LP 같은 원천 데이터를 근거로 붙입니다.
         </p>
       </header>
 
       <section className="mb-8 grid gap-3 sm:grid-cols-3">
         <SummaryCard label="첫 화면" value="Investor CRM" />
-        <SummaryCard label="근거 데이터" value="Live LP" />
+        <SummaryCard label="근거 데이터" value="Source DB" />
         <SummaryCard label="검색 범위" value="VC/AC/CVC" />
       </section>
 
@@ -29,8 +29,8 @@ export default function MarketPage() {
         </h2>
         <p className="text-sm leading-relaxed text-amber-800">
           한국벤처투자, 산업은행, 성장금융 같은 출자사업은 창업자에게 직접적인
-          액션이 아니라 투자자 리서치의 근거입니다. 창업자가 먼저 해야 할 일은
-          다양한 한국 투자자를 찾고, 내 라운드에 맞는 곳만 큐에 올리는 것입니다.
+          액션이 아니라 투자자 리서치의 근거입니다. 그래서 투자자 카드는 항상
+          어떤 원천으로 검증할지 함께 보여줘야 합니다.
         </p>
       </section>
 
