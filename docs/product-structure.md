@@ -66,7 +66,7 @@ This should become the product home for a founder starting fundraising.
 ### 2. Investor Directory
 
 Current state:
-Seeded inside the market UI component.
+Seeded in `src/data/investors`, with shared entity/source types under `src/types/investor.ts`.
 
 Target state:
 Source-backed investor entity database.
@@ -261,7 +261,7 @@ Contains extracted clauses, risk flags, and negotiation suggestions.
 ## Current Problems
 
 1. `/market` name is wrong for the product direction.
-2. Investor seed data lives in a UI component.
+2. Investor data is still seeded, not hydrated from external source adapters.
 3. Source metadata is visible but not yet used as real hydration.
 4. The README still describes the product as a term sheet guide only.
 5. The founder journey is split across pages without a clear primary workflow.
@@ -269,17 +269,15 @@ Contains extracted clauses, risk flags, and negotiation suggestions.
 
 ## Next Implementation Sequence
 
-1. Extract investor and source data from `MarketRadar` into data modules.
-2. Add `/fundraising` as the canonical fundraising workspace.
-3. Add `/investors` as the directory route.
-4. Keep `/market` as compatibility route that renders the fundraising workspace or points to it.
-5. Update README to describe the broader product.
-6. Add source adapter interfaces:
+1. Add `/fundraising` as the canonical fundraising workspace.
+2. Add `/investors` as the directory route.
+3. Keep `/market` as compatibility route that renders the fundraising workspace or points to it.
+4. Add source adapter interfaces:
    - `InvestorSource`
    - `InvestorEntity`
    - `InvestorEvidence`
-7. Convert current seed list to `source-candidate` entities with `last_verified_at: null`.
-8. Add test coverage for matching/search behavior before adding more source adapters.
+5. Convert current seed list to hydrated source-candidate entities with import metadata.
+6. Add test coverage for matching/search behavior before adding more source adapters.
 
 ## Non-Goals For Now
 

@@ -3,59 +3,23 @@
 import { useEffect, useMemo, useState } from "react";
 import type {
   LiveMarketRadarResponse,
-  LiveMarketSignal,
   LiveSignalType,
 } from "@/types/market";
+import { directorySources, investorKinds, seedInvestors } from "@/data/investors";
+import {
+  isCoreLpSignal,
+  scoreInvestorTarget,
+  sourceNames,
+  verificationLabel,
+} from "@/lib/investor-matching";
+import type {
+  InvestorKind,
+  InvestorEntity,
+  StartupProfile,
+  StartupStage,
+} from "@/types/investor";
 
-type StartupStage = "pre-seed" | "seed" | "series-a" | "growth";
-type TargetStatus = "research" | "intro" | "meeting" | "terms";
 type WorkspaceTab = "targets" | "directory" | "evidence" | "drafts";
-type InvestorKind =
-  | "VC"
-  | "초기투자"
-  | "AC"
-  | "CVC"
-  | "성장투자"
-  | "전략/금융";
-type VerificationLevel = "seed" | "source-candidate" | "source-backed";
-
-type DirectorySource = {
-  id: string;
-  name: string;
-  bestFor: string;
-  status: "live" | "identified" | "needs-license";
-  url: string;
-};
-
-type StartupProfile = {
-  stage: StartupStage;
-  sector: string;
-  roundSize: string;
-  geography: string;
-  traction: string;
-};
-
-type InvestorTarget = {
-  id: string;
-  name: string;
-  kind: InvestorKind;
-  role: "lead 후보" | "초기 리드/공동투자" | "팔로우온 후보" | "전략적 후보";
-  status: TargetStatus;
-  stageFit: StartupStage[];
-  sectors: string[];
-  route: string;
-  check: string;
-  termLens: string;
-  verification: VerificationLevel;
-  sourceIds: string[];
-};
-
-type ScoredTarget = InvestorTarget & {
-  score: number;
-  reasons: string[];
-  nextAction: string;
-  draft: string;
-};
 
 const stageLabels: Record<StartupStage, string> = {
   "pre-seed": "Pre-seed",
@@ -64,60 +28,12 @@ const stageLabels: Record<StartupStage, string> = {
   growth: "Growth",
 };
 
-const statusLabels: Record<TargetStatus, string> = {
+const statusLabels: Record<InvestorEntity["status"], string> = {
   research: "리서치",
   intro: "소개 요청",
   meeting: "미팅 준비",
   terms: "조건 검토",
 };
-
-const investorKinds: Array<InvestorKind | "전체"> = [
-  "전체",
-  "VC",
-  "초기투자",
-  "AC",
-  "CVC",
-  "성장투자",
-  "전략/금융",
-];
-
-const directorySources: DirectorySource[] = [
-  {
-    id: "kvca",
-    name: "KVCA 회원사",
-    bestFor: "국내 VC/운용사 기본 명부",
-    status: "identified",
-    url: "https://www.kvca.or.kr/",
-  },
-  {
-    id: "k-startup-ac",
-    name: "K-Startup 창업기획자 등록",
-    bestFor: "등록 액셀러레이터/AC 확인",
-    status: "identified",
-    url: "https://www.k-startup.go.kr/",
-  },
-  {
-    id: "tips",
-    name: "TIPS 운영사",
-    bestFor: "초기 투자·보육 운영사 확인",
-    status: "identified",
-    url: "https://www.jointips.or.kr/",
-  },
-  {
-    id: "pe-vc-lp",
-    name: "PE/VC/LP 출자 공고",
-    bestFor: "신규 펀드/LP 출자 신호",
-    status: "live",
-    url: "https://pe-vc-lp.com/",
-  },
-  {
-    id: "the-vc",
-    name: "THE VC",
-    bestFor: "투자 이력/포트폴리오/담당자 보강",
-    status: "needs-license",
-    url: "https://thevc.kr/",
-  },
-];
 
 const typeLabels: Record<LiveSignalType, string> = {
   "support-program": "지원사업",
@@ -125,13 +41,6 @@ const typeLabels: Record<LiveSignalType, string> = {
   "funding-news": "뉴스",
   filing: "공시",
 };
-
-const coreLpSources = [
-  "한국벤처투자",
-  "한국산업은행",
-  "한국성장금융",
-  "한국벤처캐피탈협회",
-];
 
 const defaultProfile: StartupProfile = {
   stage: "seed",
@@ -141,331 +50,6 @@ const defaultProfile: StartupProfile = {
   traction: "유료 고객과 초기 매출 있음",
 };
 
-const seedTargets: InvestorTarget[] = [
-  {
-    id: "kakao-ventures",
-    name: "Kakao Ventures",
-    kind: "초기투자",
-    role: "초기 리드/공동투자",
-    status: "intro",
-    stageFit: ["pre-seed", "seed", "series-a"],
-    sectors: ["ai", "b2b", "saas", "consumer", "mobile", "software"],
-    route: "포트폴리오 창업자 또는 공동투자 VC 경유 소개 요청",
-    check: "최근 동일 섹터 투자와 담당 파트너를 확인",
-    termLens: "초기 투자자라 후속 라운드 권리와 pro-rata 조항을 먼저 점검",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "bonangels",
-    name: "BonAngels",
-    kind: "초기투자",
-    role: "초기 리드/공동투자",
-    status: "intro",
-    stageFit: ["pre-seed", "seed"],
-    sectors: ["ai", "b2b", "saas", "consumer", "marketplace", "software"],
-    route: "창업자 네트워크, 엔젤 투자자, 기존 포트폴리오 경유",
-    check: "팀/제품 검증 단계에서 설득 가능한 traction narrative 준비",
-    termLens: "초기 라운드 valuation cap, 우선주 조건, 동반투자 구조 확인",
-    verification: "source-candidate",
-    sourceIds: ["tips", "the-vc"],
-  },
-  {
-    id: "futureplay",
-    name: "FuturePlay",
-    kind: "AC",
-    role: "초기 리드/공동투자",
-    status: "research",
-    stageFit: ["pre-seed", "seed", "series-a"],
-    sectors: ["ai", "deeptech", "robotics", "healthcare", "software"],
-    route: "기술 자문자, accelerator 네트워크, 포트폴리오 경유",
-    check: "기술 차별성과 초기 고객 검증 자료를 한 장으로 정리",
-    termLens: "기술/IP 관련 진술보장과 후속 사업협력 기대치를 분리",
-    verification: "source-candidate",
-    sourceIds: ["k-startup-ac", "tips", "the-vc"],
-  },
-  {
-    id: "bass-investment",
-    name: "Bass Investment",
-    kind: "VC",
-    role: "lead 후보",
-    status: "meeting",
-    stageFit: ["seed", "series-a"],
-    sectors: ["ai", "b2b", "saas", "commerce", "software"],
-    route: "공동투자 VC, founder referral, 기존 고객/파트너 경유",
-    check: "매출 성장률, retention, sales pipeline 근거를 먼저 확인",
-    termLens: "리드 투자 조건, board seat, follow-on reserve 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "dsc-investment",
-    name: "DSC Investment",
-    kind: "VC",
-    role: "lead 후보",
-    status: "research",
-    stageFit: ["seed", "series-a", "growth"],
-    sectors: ["ai", "deeptech", "bio", "software", "platform"],
-    route: "산업 전문가, 공동투자 VC, 심사역 직접 접점 탐색",
-    check: "라운드 규모와 리드 가능성, 펀드별 투자 단계 확인",
-    termLens: "보호조항, 이사회 구성, 후속투자 권리를 집중 검토",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "korea-investment-partners",
-    name: "Korea Investment Partners",
-    kind: "성장투자",
-    role: "팔로우온 후보",
-    status: "research",
-    stageFit: ["series-a", "growth"],
-    sectors: ["ai", "software", "bio", "global", "platform"],
-    route: "기존 투자자 소개, 성장 라운드 공동투자자 경유",
-    check: "Series A 이후 지표와 글로벌 확장 스토리 필요",
-    termLens: "대형 라운드에서 liquidation preference와 veto scope 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "altos-ventures",
-    name: "Altos Ventures",
-    kind: "성장투자",
-    role: "lead 후보",
-    status: "research",
-    stageFit: ["series-a", "growth"],
-    sectors: ["ai", "b2b", "saas", "consumer", "commerce", "software"],
-    route: "기존 투자자, 글로벌 SaaS/consumer founder, 공동투자 VC 경유",
-    check: "강한 retention, category leadership, 글로벌 확장 가능성을 확인",
-    termLens: "대형 리드 투자자의 preference, veto, information rights 범위 확인",
-    verification: "source-candidate",
-    sourceIds: ["the-vc"],
-  },
-  {
-    id: "sbva",
-    name: "SBVA",
-    kind: "성장투자",
-    role: "lead 후보",
-    status: "research",
-    stageFit: ["series-a", "growth"],
-    sectors: ["ai", "software", "deeptech", "global", "platform"],
-    route: "성장 라운드 공동투자자 또는 글로벌 네트워크 경유",
-    check: "글로벌 확장 thesis와 라운드 리드 가능성을 확인",
-    termLens: "해외 투자자 참여 시 준거법, 정보권, 후속투자 권리를 점검",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "imm-investment",
-    name: "IMM Investment",
-    kind: "성장투자",
-    role: "팔로우온 후보",
-    status: "research",
-    stageFit: ["series-a", "growth"],
-    sectors: ["ai", "software", "bio", "commerce", "platform"],
-    route: "기존 투자자 또는 성장 라운드 lead 후보 경유",
-    check: "라운드 규모, 재무 지표, 회수 가능성 관점 자료를 준비",
-    termLens: "상환권, drag/tag, 보호조항의 범위를 집중 검토",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "lb-investment",
-    name: "LB Investment",
-    kind: "VC",
-    role: "lead 후보",
-    status: "research",
-    stageFit: ["seed", "series-a", "growth"],
-    sectors: ["ai", "software", "bio", "contents", "commerce"],
-    route: "공동투자 VC, 산업 전문가, 기존 포트폴리오 경유",
-    check: "펀드별 투자 단계와 담당 심사역 sector fit 확인",
-    termLens: "리드 투자 구조와 board/observer 권리 범위 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "stonebridge-ventures",
-    name: "Stonebridge Ventures",
-    kind: "VC",
-    role: "lead 후보",
-    status: "research",
-    stageFit: ["seed", "series-a", "growth"],
-    sectors: ["ai", "deeptech", "software", "bio", "platform"],
-    route: "공동투자자 또는 sector advisor 경유",
-    check: "기술/시장 양쪽에서 투자 thesis가 맞는지 확인",
-    termLens: "기술기업 투자 시 IP 진술보장과 보호조항을 분리 검토",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "atinum-investment",
-    name: "Atinum Investment",
-    kind: "성장투자",
-    role: "팔로우온 후보",
-    status: "research",
-    stageFit: ["series-a", "growth"],
-    sectors: ["ai", "software", "bio", "platform", "global"],
-    route: "기존 투자자, 성장 라운드 lead, 포트폴리오 founder 경유",
-    check: "후속 라운드 규모와 성장 지표가 투자 기준에 맞는지 확인",
-    termLens: "대형 라운드의 liquidation stack과 후속투자 권리 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "premier-partners",
-    name: "Premier Partners",
-    kind: "성장투자",
-    role: "팔로우온 후보",
-    status: "research",
-    stageFit: ["series-a", "growth"],
-    sectors: ["software", "bio", "contents", "commerce", "platform"],
-    route: "기존 투자자 또는 later-stage 공동투자자 경유",
-    check: "성장성, 수익성 전환 경로, exit scenario를 준비",
-    termLens: "상환권과 drag-along 조건의 발동 요건을 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "capstone-partners",
-    name: "Capstone Partners",
-    kind: "VC",
-    role: "초기 리드/공동투자",
-    status: "research",
-    stageFit: ["pre-seed", "seed", "series-a"],
-    sectors: ["ai", "b2b", "saas", "software", "commerce"],
-    route: "초기투자자, accelerator, 포트폴리오 founder 경유",
-    check: "초기 고객 검증과 시장 진입 전략을 확인",
-    termLens: "초기 우선주 조건과 후속투자 권리 범위 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "tips", "the-vc"],
-  },
-  {
-    id: "mashup-ventures",
-    name: "Mashup Ventures",
-    kind: "초기투자",
-    role: "초기 리드/공동투자",
-    status: "intro",
-    stageFit: ["pre-seed", "seed"],
-    sectors: ["ai", "consumer", "b2b", "saas", "software"],
-    route: "founder referral, 커뮤니티, 초기 투자자 경유",
-    check: "팀과 시장 선택의 sharpness를 짧게 정리",
-    termLens: "초기 라운드 dilution, pro-rata, 정보권을 단순하게 유지",
-    verification: "source-candidate",
-    sourceIds: ["tips", "the-vc"],
-  },
-  {
-    id: "bluepoint",
-    name: "Bluepoint Partners",
-    kind: "AC",
-    role: "초기 리드/공동투자",
-    status: "research",
-    stageFit: ["pre-seed", "seed", "series-a"],
-    sectors: ["deeptech", "ai", "hardware", "bio", "software"],
-    route: "기술 창업 네트워크, 연구자, accelerator 프로그램 경유",
-    check: "기술 검증, PoC, 사업화 경로를 확인",
-    termLens: "기술 자문/보육 기대와 투자 조건을 분리",
-    verification: "source-candidate",
-    sourceIds: ["k-startup-ac", "tips", "the-vc"],
-  },
-  {
-    id: "primer",
-    name: "Primer",
-    kind: "AC",
-    role: "초기 리드/공동투자",
-    status: "intro",
-    stageFit: ["pre-seed", "seed"],
-    sectors: ["consumer", "b2b", "saas", "commerce", "software"],
-    route: "창업자 커뮤니티, batch alumni, angel network 경유",
-    check: "문제 정의와 초기 사용자 반응을 간결하게 준비",
-    termLens: "초기 투자 조건과 후속 투자자 권리 충돌 가능성 확인",
-    verification: "source-candidate",
-    sourceIds: ["k-startup-ac", "tips", "the-vc"],
-  },
-  {
-    id: "springcamp",
-    name: "SpringCamp",
-    kind: "초기투자",
-    role: "초기 리드/공동투자",
-    status: "research",
-    stageFit: ["pre-seed", "seed"],
-    sectors: ["ai", "software", "consumer", "b2b", "saas"],
-    route: "초기 founder referral, 커뮤니티, 공동투자자 경유",
-    check: "팀 역량과 초기 시장 검증 자료를 확인",
-    termLens: "SAFE/우선주 구조와 후속 라운드 전환 조건 확인",
-    verification: "source-candidate",
-    sourceIds: ["the-vc"],
-  },
-  {
-    id: "naver-d2sf",
-    name: "NAVER D2SF",
-    kind: "CVC",
-    role: "전략적 후보",
-    status: "research",
-    stageFit: ["pre-seed", "seed", "series-a"],
-    sectors: ["ai", "deeptech", "software", "robotics", "content"],
-    route: "기술/제품 협력 접점, D2SF 프로그램, 연구자 네트워크 경유",
-    check: "전략적 협업 가능성과 독립적 투자 thesis를 분리 확인",
-    termLens: "사업협력, 독점, 우선협상권이 투자 조건에 섞이는지 점검",
-    verification: "source-candidate",
-    sourceIds: ["the-vc"],
-  },
-  {
-    id: "kakao-investment",
-    name: "Kakao Investment",
-    kind: "CVC",
-    role: "전략적 후보",
-    status: "research",
-    stageFit: ["seed", "series-a", "growth"],
-    sectors: ["ai", "consumer", "content", "commerce", "platform"],
-    route: "사업부 협력 접점, 공동투자자, 포트폴리오 경유",
-    check: "전략적 fit과 순수 재무투자 가능성을 분리 확인",
-    termLens: "사업 제휴 조항과 투자자 권리 조항을 별도 문서로 관리",
-    verification: "source-candidate",
-    sourceIds: ["the-vc"],
-  },
-  {
-    id: "lotte-ventures",
-    name: "Lotte Ventures",
-    kind: "CVC",
-    role: "전략적 후보",
-    status: "research",
-    stageFit: ["seed", "series-a"],
-    sectors: ["commerce", "food", "consumer", "logistics", "software"],
-    route: "사업부 PoC, 오픈이노베이션, CVC 네트워크 경유",
-    check: "PoC 가능성과 투자 의사결정 라인을 분리 확인",
-    termLens: "PoC/상업계약과 투자 조건의 의존성을 낮춤",
-    verification: "source-candidate",
-    sourceIds: ["the-vc"],
-  },
-  {
-    id: "shinhan-venture-investment",
-    name: "Shinhan Venture Investment",
-    kind: "전략/금융",
-    role: "팔로우온 후보",
-    status: "research",
-    stageFit: ["seed", "series-a", "growth"],
-    sectors: ["fintech", "ai", "software", "commerce", "platform"],
-    route: "금융권 사업협력 접점, 공동투자자, 기존 투자자 경유",
-    check: "금융 규제/사업협력 fit과 투자 thesis를 분리 확인",
-    termLens: "전략적 권리, 정보 접근, 규제 관련 진술보장 범위 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-  {
-    id: "kb-investment",
-    name: "KB Investment",
-    kind: "전략/금융",
-    role: "팔로우온 후보",
-    status: "research",
-    stageFit: ["seed", "series-a", "growth"],
-    sectors: ["fintech", "ai", "software", "bio", "platform"],
-    route: "기존 투자자, 금융권 협력 접점, 공동투자자 경유",
-    check: "라운드 규모와 금융/비금융 투자 thesis를 확인",
-    termLens: "정보권, 후속투자권, 전략 협업 조항의 범위 확인",
-    verification: "source-candidate",
-    sourceIds: ["kvca", "the-vc", "pe-vc-lp"],
-  },
-];
-
 function formatGeneratedAt(value: string): string {
   return new Intl.DateTimeFormat("ko-KR", {
     dateStyle: "medium",
@@ -473,105 +57,17 @@ function formatGeneratedAt(value: string): string {
   }).format(new Date(value));
 }
 
-function tokenize(value: string): string[] {
-  return value
-    .toLowerCase()
-    .split(/[\s,./|·()]+/)
-    .map((token) => token.trim())
-    .filter((token) => token.length >= 2);
-}
-
-function isCoreLpSignal(signal: LiveMarketSignal): boolean {
-  return coreLpSources.includes(signal.source) || signal.type === "fund-of-funds";
-}
-
-function sourceNames(sourceIds: string[]): string {
-  return sourceIds
-    .map((sourceId) => directorySources.find((source) => source.id === sourceId))
-    .filter(Boolean)
-    .map((source) => source?.name)
-    .join(", ");
-}
-
-function verificationLabel(level: VerificationLevel): string {
-  if (level === "source-backed") return "source-backed";
-  if (level === "source-candidate") return "source candidate";
-  return "seed";
-}
-
-function scoreTarget(
-  target: InvestorTarget,
-  profile: StartupProfile,
-  signals: LiveMarketSignal[]
-): ScoredTarget {
-  const profileTokens = tokenize(`${profile.sector} ${profile.traction}`);
-  const matchedSectors = target.sectors.filter((sector) =>
-    profileTokens.some((token) => sector.includes(token) || token.includes(sector))
-  );
-  const hasStageFit = target.stageFit.includes(profile.stage);
-  const liveLpCount = signals.filter(isCoreLpSignal).length;
-  const supportCount = signals.filter((signal) => signal.type === "support-program")
-    .length;
-
-  let score = 40;
-  const reasons: string[] = [];
-
-  if (hasStageFit) {
-    score += 22;
-    reasons.push(`${stageLabels[profile.stage]} 단계 fit`);
-  }
-
-  if (matchedSectors.length > 0) {
-    score += Math.min(24, matchedSectors.length * 8);
-    reasons.push(`섹터 fit: ${matchedSectors.slice(0, 3).join(", ")}`);
-  }
-
-  if (target.role === "lead 후보" && profile.roundSize) {
-    score += 10;
-    reasons.push(`${profile.roundSize} 라운드 리드 가능성 검토`);
-  }
-
-  if (liveLpCount > 0) {
-    score += 8;
-    reasons.push(`라이브 출자/펀드 신호 ${liveLpCount}건`);
-  }
-
-  if (supportCount > 0 && profile.stage !== "growth") {
-    score += 4;
-    reasons.push("지원사업 병행 여지 있음");
-  }
-
-  const nextAction =
-    target.status === "research"
-      ? `${target.name}의 최근 12개월 투자, 담당 심사역, 현재 운용 펀드를 확인하고 소개 경로를 확정합니다.`
-      : target.status === "intro"
-        ? `${target.route}로 이번 주 소개 요청을 보냅니다.`
-        : target.status === "meeting"
-          ? `${target.check}를 기준으로 첫 미팅용 5문장 pitch를 준비합니다.`
-          : `${target.termLens}를 기준으로 조건표 리스크를 점검합니다.`;
-
-  const draft = `${target.name} 소개를 부탁드리고 싶습니다. 저희는 ${profile.geography} 기반 ${profile.sector} 팀이고, 현재 ${stageLabels[profile.stage]} ${profile.roundSize} 라운드를 준비 중입니다. ${profile.traction}. ${target.name}은 ${target.role}로 fit이 있을 수 있어 보이며, 특히 ${target.check} 관점에서 대화를 열어보고 싶습니다. 소개 가능하실까요?`;
-
-  return {
-    ...target,
-    score: Math.min(100, score),
-    reasons: reasons.slice(0, 4),
-    nextAction,
-    draft,
-  };
-}
-
 export function MarketRadar() {
   const [profile, setProfile] = useState<StartupProfile>(defaultProfile);
   const [data, setData] = useState<LiveMarketRadarResponse | null>(null);
-  const [selectedTargetId, setSelectedTargetId] = useState(seedTargets[0].id);
+  const [selectedTargetId, setSelectedTargetId] = useState(seedInvestors[0].id);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("targets");
   const [directoryQuery, setDirectoryQuery] = useState("");
   const [activeInvestorKind, setActiveInvestorKind] =
     useState<InvestorKind | "전체">("전체");
   const [savedTargetIds, setSavedTargetIds] = useState<string[]>([
-    seedTargets[0].id,
-    seedTargets[3].id,
+    seedInvestors[0].id,
+    seedInvestors[3].id,
   ]);
   const [evidenceFilter, setEvidenceFilter] = useState<LiveSignalType | "all">(
     "fund-of-funds"
@@ -607,8 +103,8 @@ export function MarketRadar() {
   const signals = useMemo(() => data?.signals ?? [], [data]);
 
   const scoredTargets = useMemo(() => {
-    return seedTargets
-      .map((target) => scoreTarget(target, profile, signals))
+    return seedInvestors
+      .map((target) => scoreInvestorTarget(target, profile, signals))
       .sort((a, b) => b.score - a.score);
   }, [profile, signals]);
 
