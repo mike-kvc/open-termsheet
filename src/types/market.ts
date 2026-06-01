@@ -32,3 +32,40 @@ export interface MarketIntegration {
   implementationNotes: string;
   risks: string[];
 }
+
+export type LiveSignalType =
+  | "support-program"
+  | "fund-of-funds"
+  | "funding-news"
+  | "filing";
+
+export type LiveSignalConfidence = "official" | "source" | "candidate";
+
+export interface LiveMarketSignal {
+  id: string;
+  type: LiveSignalType;
+  title: string;
+  source: string;
+  url: string;
+  detectedAt?: string;
+  deadlineLabel?: string;
+  category?: string;
+  summary: string;
+  relevance: string;
+  confidence: LiveSignalConfidence;
+}
+
+export interface LiveMarketSourceStatus {
+  id: string;
+  name: string;
+  status: "live" | "not-configured" | "error";
+  itemCount: number;
+  message?: string;
+  sourceUrl: string;
+}
+
+export interface LiveMarketRadarResponse {
+  generatedAt: string;
+  signals: LiveMarketSignal[];
+  sources: LiveMarketSourceStatus[];
+}
