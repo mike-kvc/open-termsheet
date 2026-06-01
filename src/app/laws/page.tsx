@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { clauses } from "@/data/clauses";
 
 interface LawEntry {
@@ -101,10 +102,7 @@ export default function LawsPage() {
         </section>
       ))}
 
-      <div className="mt-12 p-4 bg-zinc-50 rounded-lg text-xs text-zinc-400">
-        이 내용은 법률 자문이 아니며, 실제 투자 계약 시 반드시 전문가의 검토를
-        받으시기 바랍니다.
-      </div>
+      <LegalDisclaimer context="general" className="mt-12" />
     </div>
   );
 }

@@ -144,16 +144,14 @@ Deemed Liquidation이 트리거되었을 때 매각가가 총 투자금보다 �
         url: "https://www.law.go.kr/법령/자본시장과금융투자업에관한법률",
       },
       {
-        name: "벤처투자촉진에 관한 특별법 제41조 (조합원에 대한 분배)",
+        name: "벤처투자조합 규약의 분배 및 회수 조항",
         relevance:
           "벤처투자조합이 M&A 등 Deemed Liquidation 트리거 발동으로 투자금을 회수하는 경우, 조합원(LP)에 대한 분배 절차 및 우선순위는 조합 규약과 이 규정의 적용을 받습니다. 투자계약상 Deemed Liquidation에 따른 우선분배 구조가 조합의 분배 규정과 정합성을 갖추어야 합니다.",
-        url: "https://www.law.go.kr/법령/벤처투자촉진에관한특별법",
       },
       {
-        name: "벤처투자촉진에 관한 특별법 제50조 (벤처투자의 방법)",
+        name: "벤처투자조합 규약 및 내부 운용기준",
         relevance:
           "주식·전환사채 등 투자 방식에 따라 M&A EXIT 시 Deemed Liquidation 적용 방식이 달라질 수 있습니다. 벤처투자조합이 투자자인 경우, M&A 대금 분배 구조가 조합의 투자금 회수 규정 및 조합 규약과 일치하는지 확인해야 합니다.",
-        url: "https://www.law.go.kr/법령/벤처투자촉진에관한특별법",
       },
     ],
     risk_level: "yellow",

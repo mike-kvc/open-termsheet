@@ -125,10 +125,9 @@ export const boardNomination: Clause = {
         url: "https://www.law.go.kr/법령/상법",
       },
       {
-        name: "벤처투자촉진에 관한 특별법 제37조 (벤처투자조합의 업무)",
+        name: "벤처투자조합 규약 및 GP 내부 승인기준",
         relevance:
           "벤처투자조합(GP)이 피투자 회사의 이사를 지명하는 것은 조합 업무 범위 내의 투자자 보호 활동에 해당합니다. 다만 GP 임직원이 이사를 겸직할 때 조합 규약상의 이해충돌 방지 규정을 준수해야 합니다.",
-        url: "https://www.law.go.kr/법령/벤처투자촉진에관한특별법",
       },
     ],
     risk_level: "yellow",

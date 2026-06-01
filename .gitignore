@@ -36,8 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# omc
+# omc / omx local workflow state
 .omc/
+.omx/
 
 # typescript
 *.tsbuildinfo

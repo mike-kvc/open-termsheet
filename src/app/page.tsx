@@ -12,7 +12,7 @@ export default function Home() {
         </h1>
         <p className="text-zinc-500 text-lg leading-relaxed">
           스타트업 투자 계약의 주요 조항을 창업자와 투자자 양쪽 관점에서
-          해석합니다. 사례 기반의 쉬운 설명과 한국 법률 검토를 포함합니다.
+          해석합니다. 사례 기반의 쉬운 설명과 관련 법령·실무상 쟁점 요약을 포함합니다.
         </p>
       </section>
 

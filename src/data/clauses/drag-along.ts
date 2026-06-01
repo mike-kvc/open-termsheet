@@ -79,9 +79,9 @@ export const dragAlong: Clause = {
   legal_check: {
     applicable_laws: [
       {
-        name: "상법 제360조의2 (소수주주의 주식매수청구권)",
+        name: "상법 제374조의2 / 제360조의5 (반대주주의 주식매수청구권)",
         relevance:
-          "합병·분할 등 특정 구조 변경에서 반대 주주의 매수청구권이 인정됨. Drag-Along에 의한 강제 매각과의 중복·충돌 가능성이 있으며, 공정가격 보장 여부가 쟁점이 됨.",
+          "합병·영업양도·주식교환 등 법정 조직재편에서는 반대 주주의 주식매수청구권이 문제될 수 있음. Drag-Along에 의한 계약상 강제 매각과는 적용 국면이 다르지만, 공정가격 보장과 절차 설계에서 함께 검토해야 함.",
         url: "https://www.law.go.kr/법령/상법",
       },
       {
@@ -103,10 +103,9 @@ export const dragAlong: Clause = {
         url: "https://www.law.go.kr/법령/독점규제및공정거래에관한법률",
       },
       {
-        name: "벤처투자촉진에 관한 특별법 제50조 (벤처투자의 방법)",
+        name: "벤처투자조합 규약 및 내부 운용기준",
         relevance:
           "벤처투자조합이 투자자인 경우, Drag-Along을 통한 M&A EXIT은 조합의 투자금 회수 수단에 해당합니다. 조합 규약상 M&A 참여 및 의결 방식, 조합원 동의 절차 등을 사전에 확인해야 하며, 조합 GP가 Drag-Along 발동에 찬성하는 결정을 내릴 때는 수익자(LP)의 이익을 최우선으로 고려해야 합니다.",
-        url: "https://www.law.go.kr/법령/벤처투자촉진에관한특별법",
       },
     ],
     risk_level: "red",

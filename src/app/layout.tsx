@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -55,6 +56,12 @@ export default function RootLayout({
                 시뮬레이터
               </Link>
               <Link
+                href="/market"
+                className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
+              >
+                시장
+              </Link>
+              <Link
                 href="/laws"
                 className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors"
               >
@@ -71,11 +78,8 @@ export default function RootLayout({
         </header>
         <main className="flex-1">{children}</main>
         <footer className="border-t border-zinc-200">
-          <div className="max-w-3xl mx-auto px-6 py-6 text-xs text-zinc-400">
-            <p>
-              이 사이트의 내용은 법률 자문이 아니며, 실제 투자 계약 시 반드시
-              전문가(변호사, 세무사)의 검토를 받으시기 바랍니다.
-            </p>
+          <div className="max-w-3xl mx-auto px-6 py-6">
+            <LegalDisclaimer />
           </div>
         </footer>
       </body>

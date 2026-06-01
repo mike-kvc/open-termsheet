@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { clauses, clauseMap } from "@/data/clauses";
 
 export function generateStaticParams() {
@@ -55,6 +56,7 @@ export default async function ClausePage({
         </h1>
         <p className="text-zinc-400 mb-4">{clause.name}</p>
         <p className="text-zinc-600 leading-relaxed">{clause.summary}</p>
+        <LegalDisclaimer context="clause" className="mt-6" />
       </header>
 
       {/* Variants */}
@@ -155,11 +157,19 @@ export default async function ClausePage({
 
       {/* Legal Check */}
       <Section title="법률 검토">
+        <div className="mb-5 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm leading-relaxed text-blue-900">
+          <p className="font-medium">법리와 실무를 함께 읽는 방법</p>
+          <p className="mt-1 text-xs text-blue-800">
+            법령 조문은 출발점입니다. 실제 딜에서는 정관 반영 여부, 계약 당사자,
+            투자자 펀드 규약, 등기·회계·상장 실무, 위반 시 구제수단 설계에 따라
+            같은 조항도 다르게 작동할 수 있습니다.
+          </p>
+        </div>
         <div className="mb-4">
           <span
             className={`text-xs px-2 py-1 rounded-full ${riskColor[clause.legal_check.risk_level]}`}
           >
-            법적 리스크: {riskLabel[clause.legal_check.risk_level]}
+            점검 필요도: {riskLabel[clause.legal_check.risk_level]}
           </span>
         </div>
 

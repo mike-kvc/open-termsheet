@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
 
 interface Round {
   name: string;
@@ -356,12 +357,7 @@ export default function SimulatorPage() {
         </Section>
       )}
 
-      <div className="mt-12 p-4 bg-zinc-50 rounded-lg text-xs text-zinc-400">
-        이 시뮬레이터는 참고 목적으로 제공되며, 실제 투자 계약 시 반드시
-        전문가(변호사, 세무사)의 검토를 받으시기 바랍니다. Anti-dilution
-        전환비율 조정 등 복잡한 조건은 실제 계약서의 구체적 조항에 따라 달라질
-        수 있습니다.
-      </div>
+      <LegalDisclaimer context="simulator" className="mt-12" />
     </div>
   );
 }

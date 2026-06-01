@@ -112,10 +112,9 @@ export const nonCompete: Clause = {
         url: "https://www.law.go.kr/법령/독점규제및공정거래에관한법률",
       },
       {
-        name: "벤처투자촉진에 관한 특별법 제37조 (경영참여 등)",
+        name: "벤처투자조합 규약 및 GP 내부 승인기준",
         relevance:
           "벤처투자조합이 투자 대상 회사에 대해 경영참여 및 경영안정 관련 약정을 체결할 수 있는 근거 조항. 전업의무·경업금지 조항은 이 조항의 경영안정 약정에 해당.",
-        url: "https://www.law.go.kr/법령/벤처투자촉진에관한특별법",
       },
     ],
     risk_level: "yellow",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
 import { clauses } from "@/data/clauses";
 import type { Clause } from "@/types/clause";
 
@@ -157,7 +158,7 @@ const clauseKeywords: Record<string, string[]> = {
 };
 
 const glossary: Record<string, string> = {
-  "RCPS": "상환전환우선주. 전환권+상환권이 모두 있는 우선주로 한국 VC 투자의 표준",
+  "RCPS": "상환전환우선주. 전환권+상환권이 모두 있는 우선주로 한국 VC 투자에서 자주 쓰이는 구조",
   "participating": "참가적. 원금 우선 회수 후 남은 금액에서도 지분만큼 추가 수령 (이중 취식)",
   "non-participating": "비참가적. 원금 우선 회수 또는 지분 비례 배분 중 택 1",
   "liquidation": "청산/잔여재산분배. 회사 매각·청산 시 투자금을 먼저 돌려받는 권리",
@@ -176,11 +177,11 @@ const glossary: Record<string, string> = {
   "클리프": "Cliff. 베스팅 시작 전 최소 근무 기간 (보통 1년). 이 기간 내 퇴사 시 지분 0",
   "R&W": "Representations & Warranties. 회사 상태가 진실함을 보장하는 조항",
   "CP": "Conditions Precedent. 선행조건. Closing 전에 충족해야 하는 전제조건",
-  "Closing": "거래종결. 투자금 납입 + 주권 교부 + 등기 완료",
+  "Closing": "거래종결. 실무상 투자금 납입을 중심으로 보며, 등기와 주주명부 정리는 별도 후속 절차로 관리",
   "배당가능이익": "상법상 상환이 가능한 이익 범위. 초기 스타트업은 대부분 0원",
   "간주청산": "M&A 등을 청산과 동일하게 취급하여 우선분배를 적용하는 조항",
   "경업금지": "창업자가 회사와 경쟁하는 사업에 종사하는 것을 금지하는 조항",
-  "정관": "회사의 기본 규칙. 우선주 권리는 정관에 규정해야 법적 효력 발생",
+  "정관": "회사의 기본 규칙. 우선주 권리는 정관과 발행조건에 반영되어야 법적 효력의 근거가 됨",
   "Pre-money": "투자 유치 전 기업가치. Post-money = Pre-money + 투자금",
   "Post-money": "투자 유치 후 기업가치. 투자자 지분율 = 투자금 / Post-money",
 };
@@ -339,8 +340,9 @@ export default function AnalyzePage() {
         </h1>
         <p className="text-zinc-500">
           투자 텀시트 또는 계약서 텍스트를 붙여넣으면 포함된 조항을 자동으로
-          식별하고, 각 조항에 대한 해석과 주의점을 보여드립니다.
+          식별하고, 각 조항에 대한 일반적 해석과 실무상 확인 포인트를 보여드립니다.
         </p>
+        <LegalDisclaimer context="analysis" className="mt-6" />
       </header>
 
       {/* File Upload */}
@@ -425,7 +427,7 @@ export default function AnalyzePage() {
               {results.length > 0 && (
                 <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
                   <h3 className="text-sm font-bold text-red-800 mb-3">
-                    이것만 확인하세요
+                    우선 확인할 후보 조항
                   </h3>
                   <div className="space-y-2">
                     {results
@@ -472,7 +474,7 @@ export default function AnalyzePage() {
                         <span
                           className={`text-xs px-2 py-1 rounded-full shrink-0 ${riskColor[clause.legal_check.risk_level]}`}
                         >
-                          리스크: {riskLabel[clause.legal_check.risk_level]}
+                          점검 필요도: {riskLabel[clause.legal_check.risk_level]}
                         </span>
                       </div>
 
@@ -520,10 +522,6 @@ export default function AnalyzePage() {
         </div>
       )}
 
-      <div className="mt-12 p-4 bg-zinc-50 rounded-lg text-xs text-zinc-400">
-        이 분석 결과는 참고용이며 법률 자문을 대체하지 않습니다. 실제 투자
-        계약 시 반드시 전문가의 검토를 받으시기 바랍니다.
-      </div>
     </div>
   );
 }

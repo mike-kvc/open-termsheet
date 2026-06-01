@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LegalDisclaimer } from "@/components/legal-disclaimer";
 
 export default function GuidePage() {
   return (
@@ -94,7 +95,7 @@ export default function GuidePage() {
             title="밸류에이션과 투자 구조"
             items={[
               "Pre-money vs Post-money 명확한지 확인 — 이것만 틀려도 지분율이 크게 달라짐",
-              "투자 주식의 종류 (RCPS가 표준) 및 주당 발행가",
+              "투자 주식의 종류 (RCPS/CPS/보통주 등), 의결권 유무, 주당 발행가",
               "Fully diluted 기준으로 Cap Table 작성 — 스톡옵션 풀 포함",
             ]}
           />
@@ -112,7 +113,7 @@ export default function GuidePage() {
             step={3}
             title="지배구조와 투자자 보호"
             items={[
-              "사전동의 항목 범위 — 14개가 표준, 과도하게 넓지 않은지",
+              "사전동의 항목 범위 — 시장 관행상 자주 쓰이는 항목인지, 과도하게 넓지 않은지",
               "이사 지명권 — 이사 수 변경도 사전동의 대상인지",
               "보고의무 — 월간/분기/연간 제출 일정과 형식",
               "경업금지/전업의무 — 범위(업종, 지역, 기간)가 합리적인지",
@@ -154,14 +155,15 @@ export default function GuidePage() {
             url="https://www.law.go.kr/법령/상법"
             role="투자 계약의 기본 골격"
             keyPoints={[
-              "제344조 (종류주식) — RCPS 발행의 법적 근거. 우선주의 권리는 정관에 규정해야 효력 발생",
+              "제344조 (종류주식) — RCPS/CPS 등 종류주식 발행의 기본 근거. 권리 내용과 수는 정관 및 발행조건으로 확인",
+              "제344조의3 (의결권 배제·제한 종류주식) — 무의결권 또는 의결권 제한 우선주는 정관 기재사항과 발행주식총수 4분의 1 한도 확인",
               "제335조 (주식양도) — 주식 양도의 자유가 원칙. 계약상 Lock-up만으로는 양도 무효 주장 어려움 → 정관에 양도제한 병행 필요",
               "제345조 (주식상환) — 상환은 배당가능이익 범위 내에서만 가능. 초기 스타트업은 대부분 배당가능이익 없음",
               "제346조 (전환주식) — 전환 조건은 정관 기재 사항. Anti-dilution 공식도 정관에 반영해야 안전",
               "제382조 (이사 선임) — 투자자 지명권은 '추천권'이고 최종 선임은 주총",
               "제397조 (경업금지) — 이사의 경업금지. VC 파트너가 경쟁 포트폴리오 이사 겸직 시 저촉",
             ]}
-            impact="정관에 반영되지 않은 우선주 권리는 법적 효력이 없습니다. SHA(주주간계약)만으로는 제3자에 대항 불가."
+            impact="정관에 반영되지 않은 우선주 권리는 효력이 부정되거나 제3자에 대한 대항력이 제한될 수 있습니다. SHA(주주간계약)만으로 충분한지는 거래 구조별로 별도 검토가 필요합니다."
           />
           <LawCard
             title="벤처투자촉진에 관한 특별법 (벤처투자법)"
@@ -169,23 +171,23 @@ export default function GuidePage() {
             role="VC 펀드(벤처투자조합)의 투자 활동 규율"
             keyPoints={[
               "제2조 (정의) — 벤처투자, 벤처투자조합, 중소기업창업투자회사 등 정의",
-              "제37조 (조합 업무) — 조합의 투자 활동 범위와 GP의 권한. 사전동의권 행사의 근거",
-              "제41조 (분배) — 조합원(LP)에 대한 수익 분배 규정. Liquidation preference의 법적 배경",
-              "제50조 (투자 방법) — 주식, 전환사채, 조건부지분인수계약 등 허용되는 투자 방식",
-              "제51조 (조건 공시) — 투자 조건 변경(Anti-dilution 적용 등) 시 공시 의무",
-              "제69조 (조합 해산) — 펀드 존속기간 만료 시 투자금 회수. 상환권/Put Option과 연결",
+              "조합 규약 및 내부 승인기준 — GP의 투자·회수·동의권 행사 권한과 LP 보고 절차 확인",
+              "조합 규약의 분배 조항 — 투자회수금의 LP 분배 waterfall 및 보고 기준 확인",
+              "투자 가능 증권 및 회수 방식 — 법령뿐 아니라 개별 조합 규약의 제한 확인",
+              "투자 조건 변경 보고 — 법령 단정이 아니라 조합 규약, LP side letter, 내부 규정 확인 필요",
+              "조합 존속기간/청산 조항 — 만기 임박 시 회수 압력과 세컨더리·전환·매각 전략에 영향",
             ]}
-            impact="모태펀드(KVIC) 출자를 받은 VC는 이 법의 적용을 받으며, full ratchet 지양 등 가이드라인이 시장 표준에 영향."
+            impact="모태펀드 출자 여부, 조합 규약, LP side letter에 따라 운용 제한이 달라질 수 있습니다. 특정 조항의 허용 여부는 법령명만으로 단정하지 말고 해당 펀드 문서를 확인해야 합니다."
           />
           <LawCard
             title="벤처기업육성에 관한 특별조치법 (벤처기업법)"
             url="https://www.law.go.kr/법령/벤처기업육성에관한특별조치법"
             role="벤처기업 확인 요건 및 스톡옵션 특례"
             keyPoints={[
-              "제16조의3 (스톡옵션 특례) — 벤처기업은 발행주식총수의 50%까지 스톡옵션 부여 가능 (상법은 10%)",
+              "제16조의3 및 시행령 — 벤처기업은 상법보다 넓은 범위에서 스톡옵션 부여 가능. 구체 한도와 절차는 시행령 및 최신 개정 확인 필요",
               "벤처기업 확인 — 벤처투자 유형, 기술평가 유형 등. VC 투자를 받으면 벤처기업 확인이 용이",
             ]}
-            impact="스톡옵션 풀 설계 시 벤처기업 확인 여부에 따라 한도가 5배 차이. 확인 갱신 관리 필요."
+            impact="스톡옵션 풀 설계 시 벤처기업 확인 여부, 부여 대상, 이사회 위임 가능 범위, 신고 절차를 함께 확인해야 합니다."
           />
           <LawCard
             title="자본시장과 금융투자업에 관한 법률 (자본시장법)"
@@ -222,6 +224,25 @@ export default function GuidePage() {
             impact="세무 영향을 고려하지 않고 구조를 설계하면 예상 못한 세금이 발생합니다."
           />
         </div>
+
+        <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm leading-relaxed text-blue-900">
+          <h3 className="font-semibold">법률 DD 관점에서 읽는 법</h3>
+          <ul className="mt-3 space-y-2 text-xs text-blue-800">
+            <li>
+              <strong>법리:</strong> 상법상 허용되는 종류주식 구조인지, 정관과
+              주주총회·이사회 결의가 권리 내용을 뒷받침하는지 먼저 봅니다.
+            </li>
+            <li>
+              <strong>실무:</strong> 법리상 가능해도 등기소, 회계법인, 상장주관사,
+              기존 투자자 동의, 펀드 규약에서 별도 이슈가 생길 수 있습니다.
+            </li>
+            <li>
+              <strong>문서 정합성:</strong> Term Sheet, SSA, SHA, 정관, 별첨 우선주
+              조건, 주주명부, 등기부의 표현이 서로 다르면 실제 집행 단계에서 가장
+              먼저 문제가 됩니다.
+            </li>
+          </ul>
+        </div>
       </Section>
 
       {/* 계약서 구조 */}
@@ -244,7 +265,7 @@ export default function GuidePage() {
           />
           <DocCard
             title="별첨2 — 우선주 조건"
-            description="전환권, 상환권, 배당, Anti-dilution 등 RCPS의 경제적 권리를 구체적으로 규정. 정관 변경안과 일치해야 함."
+            description="전환권, 상환권, 배당, Anti-dilution, 의결권 유무 등 RCPS/CPS의 권리 내용을 구체적으로 규정. 정관 변경안과 일치해야 함."
             binding="전면적"
           />
           <DocCard
@@ -254,7 +275,7 @@ export default function GuidePage() {
           />
           <DocCard
             title="정관"
-            description="우선주의 법적 근거. 별첨2의 내용이 정관에 반영되어야 법적 효력 발생."
+            description="우선주의 법적 근거. 별첨2의 내용이 정관에 반영되어야 법적 효력의 근거."
             binding="상법상 효력"
           />
           <DocCard
@@ -340,7 +361,7 @@ export default function GuidePage() {
           <TimelineItem
             title="거래종결 (Closing)"
             duration="1일"
-            description="투자금 납입, 주권 교부, 증자 등기. 투자 완료."
+            description="투자금 납입. 납입기일 다음 날부터 투자자는 주주 지위를 취득하고, 이후 주주명부 정리와 증자등기를 진행."
           />
         </div>
         <p className="text-sm text-zinc-500">
@@ -348,10 +369,63 @@ export default function GuidePage() {
         </p>
       </Section>
 
-      <div className="mt-12 p-4 bg-zinc-50 rounded-lg text-xs text-zinc-400">
-        이 가이드는 법률 자문이 아니며, 실제 투자 계약 시 반드시 전문가(변호사,
-        세무사)의 검토를 받으시기 바랍니다.
-      </div>
+      {/* Closing 이후 행정절차 */}
+      <Section title="7. 납입 이후 행정절차">
+        <p className="text-sm text-zinc-600 leading-relaxed mb-6">
+          일반적인 비상장 스타트업의 제3자배정 유상증자에서는 주주총회나
+          이사회 결의가 대부분 납입 전에 완료됩니다. 납입 이후에는 새로
+          주주총회를 여는 것이 기본 절차는 아니고, 주주 지위 발생, 주주명부
+          반영, 증자등기, 투자자 전달서류 정리가 핵심입니다.
+        </p>
+
+        <div className="space-y-4 mb-6">
+          <StepCard
+            step={1}
+            title="납입 확인"
+            items={[
+              "투자자가 납입기일까지 회사 지정 계좌로 인수대금을 입금",
+              "회사 또는 법무사가 잔고증명, 주금납입 확인자료, 청약서 등 등기 패키지 확인",
+              "여러 투자자의 납입기일이 다르면 등기 일정도 분리될 수 있으므로 같은 납입기일로 맞추는 것이 실무상 편리",
+            ]}
+          />
+          <StepCard
+            step={2}
+            title="주주 지위 발생"
+            items={[
+              "상법상 신주 인수인은 납입기일 다음 날부터 주주의 권리와 의무를 가짐",
+              "이 시점부터 주주명부와 Cap Table에 투자자를 반영",
+              "주권을 실제 발행하지 않는 회사라면 주권미발행확인서 등 post-closing 서류를 함께 정리",
+            ]}
+          />
+          <StepCard
+            step={3}
+            title="증자등기"
+            items={[
+              "납입기일 다음 날부터 통상 2주 이내에 본점 소재지 관할 등기소에 자본금 및 발행주식 총수 변경등기 신청",
+              "주요 첨부서류는 신주발행 결의서 또는 의사록, 정관, 주식청약서, 납입 확인자료, 주주명부, 인감 관련 서류",
+              "기한을 넘기면 과태료 리스크가 있으므로 납입 전부터 법무사가 등기서류를 준비해두는 것이 일반적",
+            ]}
+          />
+          <StepCard
+            step={4}
+            title="Post-closing 전달"
+            items={[
+              "등기 완료 후 등기사항전부증명서, 주주명부, 정관, 주권미발행확인서 등을 투자자에게 전달",
+              "투자계약상 post-closing covenant가 있으면 이사 선임, 보고자료 제출, 정관/주주명부 사본 제공 등 후속 의무를 별도 체크",
+              "투자자 지명 이사 선임이나 스톡옵션 풀 조정처럼 주총이 필요한 사항은 계약상 선행조건 또는 후행의무로 분리해 관리",
+            ]}
+          />
+        </div>
+
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
+          <strong>핵심:</strong> 납입 이후에 주총을 새로 하는 것이 통상적인 기본 절차는
+          아닙니다. 정관 변경, 종류주식 발행 근거, 제3자배정 통지/동의,
+          신주발행 결의는 납입 전에 끝나 있어야 하고, 납입 후에는 2주 내
+          증자등기와 주주명부 정리가 중심입니다.
+        </div>
+      </Section>
+
+      <LegalDisclaimer context="general" className="mt-12" />
     </div>
   );
 }
