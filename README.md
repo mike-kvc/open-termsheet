@@ -1,6 +1,8 @@
 # Open Termsheet
 
-스타트업 투자 텀시트(Term Sheet)의 주요 조항을 **창업자와 투자자 양쪽 관점**에서 해석하는 오픈소스 가이드입니다.
+스타트업이 펀딩을 준비할 때 투자자 탐색, 아웃리치, 텀시트 이해를 한 흐름에서 처리할 수 있도록 만드는 오픈소스 펀딩 워크스페이스입니다.
+
+초기 버전은 텀시트(Term Sheet)의 주요 조항을 **창업자와 투자자 양쪽 관점**에서 해석하는 가이드에서 시작했고, 현재는 한국 투자자 디렉토리와 source-backed 펀딩 CRM 방향으로 확장 중입니다.
 
 https://open-termsheet.vercel.app
 
@@ -12,10 +14,29 @@ https://open-termsheet.vercel.app
 
 ## 특징
 
+- **한국 투자자 디렉토리** — VC, 초기투자사, AC, CVC, 성장투자자, 금융/전략 투자자 탐색
+- **Source-backed CRM** — KVCA, K-Startup, TIPS, PE/VC/LP, THE VC 등 원천 후보를 투자자 카드에 연결
+- **펀딩 실행 흐름** — 회사 프로필 → 투자자 타겟 → 근거 확인 → 소개 요청/미팅 준비
 - **양면 해석** — 각 조항을 창업자/투자자 관점에서 설명
 - **사례 기반** — 구체적인 숫자 시나리오로 조항의 실질적 영향을 보여줌
 - **법률 검토** — 한국 상법, 벤처투자법, 벤처기업법 등 관련 법령과 리스크 포인트
 - **시장 기준** — founder-friendly ↔ investor-friendly 스펙트럼 표시
+
+## 제품 구조
+
+제품 구조와 다음 구현 순서는 [`docs/product-structure.md`](docs/product-structure.md)에 정리되어 있습니다.
+
+핵심 루프는 다음과 같습니다.
+
+```text
+Company profile
+-> Investor discovery
+-> Target queue
+-> Evidence and source verification
+-> Outreach and meeting prep
+-> Term sheet analysis
+-> Negotiation and closing checklist
+```
 
 ## 포함된 조항 (15개)
 
